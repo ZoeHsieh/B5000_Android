@@ -87,6 +87,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     private boolean isScanning = false;
     private boolean isCheckConnection = false;
     private Thread CheckConnection = null;
+    private ArrayAdapter<String> mDevListAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1072,6 +1073,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     }
 
     private void showDevices() {
+        StopScanningTimer();
         AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
         builder.setTitle(R.string.choose_device);
         builder.setCancelable(true);
@@ -1086,11 +1088,11 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
             deviceList[i] =  deviceInfoList.scanItems.get(i).dev_name;
             deviceListObj.scanItems.add(deviceInfoList.scanItems.get(i));
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                R.layout.item_device, R.id.text, deviceList);
-
-        listView.setAdapter(adapter);
-
+        if(deviceList.length >0) {
+            mDevListAdapter = new ArrayAdapter<>(this,
+                    R.layout.item_device, R.id.text, deviceList);
+            listView.setAdapter(mDevListAdapter);
+        }
         builder.setView(listView);
         final AlertDialog dialog = builder.create();
 
@@ -1121,8 +1123,10 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                 dialog.dismiss();
             }
         });
+        if(deviceList.length >0)
+            dialog.show();
 
-        dialog.show();
+        StartScanningTimer();
     }
 
     private void updateStatus() {

@@ -515,8 +515,10 @@ public class HistoryActivity extends bpActivity implements View.OnClickListener,
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(!isHistoryDownloadOK)
+        if(!isHistoryDownloadOK){
             mHistoryDatas.clear();
+            isCancel = true;
+        }
 
         unregisterReceiver(mGattUpdateReceiver);
         overridePendingTransitionLeftToRight();

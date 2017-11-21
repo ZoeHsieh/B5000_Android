@@ -31,14 +31,14 @@ public class UsersListActivity extends bpActivity implements View.OnClickListene
     private final boolean debugFlag = true;
     private RecyclerView mRecyclerView;
     private UsersInfoAdapter mAdapter;
-    private int userCount = 1;
+    private volatile int userCount = 1;
     private int user_read_retry_cnt=0;
     private int userMax = 0;
 
     private Thread UserLoadingTHD = null;
     private boolean isLiveUSTHD = false;
     private ProgressDialog progressDialog = null;
-    private boolean isCancel = false;
+    private volatile boolean isCancel = false;
     private UserData userTmpItem = new UserData("","","",0);
     public static UserData userInfoData;
     public static int updateStatus  = 0;
@@ -232,8 +232,10 @@ public class UsersListActivity extends bpActivity implements View.OnClickListene
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(!isLoadUserListCompleted)
-        mUserDataList.clear();
+        if(!isLoadUserListCompleted){
+         mUserDataList.clear();
+        isCancel  = true;
+        }
         overridePendingTransitionLeftToRight();
         unregisterReceiver(mGattUpdateReceiver);
     }

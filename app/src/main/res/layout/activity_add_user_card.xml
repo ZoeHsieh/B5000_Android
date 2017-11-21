@@ -57,5 +57,8 @@
         android:inputType="numberDecimal"
         android:digits="1234567890"
         android:maxLength="10"
-        app:subject="@string/Card" />
+        app:subject="@string/Card" >
+
+    </com.anxell.e5ar.custom.MyEditText>
+
 </LinearLayout>

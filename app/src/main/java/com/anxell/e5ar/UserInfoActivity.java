@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -27,6 +28,7 @@ import com.anxell.e5ar.transport.GeneralDialog;
 import com.anxell.e5ar.transport.bpActivity;
 import com.anxell.e5ar.util.Util;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -587,24 +589,35 @@ public class UserInfoActivity extends bpActivity implements View.OnClickListener
         builder.setTitle(getResources().getString(R.string.users_card_edit_dialog_title));
 
         builder.setView(item);
+        final EditText ArrayCard[] = new EditText[10];
+        final int uiCardEditID []={R.id.editText_Users_Edit_Dialog_Card1,R.id.editText_Users_Edit_Dialog_Card2,
+                             R.id.editText_Users_Edit_Dialog_Card3,R.id.editText_Users_Edit_Dialog_Card4,
+                             R.id.editText_Users_Edit_Dialog_Card5,R.id.editText_Users_Edit_Dialog_Card6,
+                             R.id.editText_Users_Edit_Dialog_Card7,R.id.editText_Users_Edit_Dialog_Card8,
+                             R.id.editText_Users_Edit_Dialog_Card9,R.id.editText_Users_Edit_Dialog_Card10
+                             };
 
-        final EditText card = (EditText) item.findViewById(R.id.editText_Users_Edit_Dialog_Card);
-        if(Current_User.getCard().equals(BPprotocol.spaceCardStr))
-        card.setText("");
-        else
-          card.setText(Current_User.getCard());
-        card.setRawInputType(currActivity.getResources().getConfiguration().KEYBOARD_12KEY);
+
+
         builder.setPositiveButton(getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                UserData new_User_Data = new UserData(Current_User.getId(),Current_User.getPasswrod(),card.getText().toString(),Current_User.getUserIndex());
+
+                String cardStr = "";
+                for(int i=0;i<uiCardEditID.length;i++)
+                    cardStr += ArrayCard[i].getText().toString();
+
+
+                Util.debugMessage(TAG,"Edit user card dialog cardStr="+cardStr,debugFlag);
+
+                UserData new_User_Data = new UserData(Current_User.getId(),Current_User.getPasswrod(),cardStr,Current_User.getUserIndex());
 
                 //Check Duplicated
 
-                boolean isDuplicated_Card = Util.checkUserDuplicateByCard(card.getText().toString(),mUsersItems);
+                boolean isDuplicated_Card = Util.checkUserDuplicateByCard(cardStr,mUsersItems);
                 boolean isAdminCard = new_User_Data.getCard().equals(currAdminCard);
-                if(new_User_Data.getCard().equals("")){
+                if(cardStr.equals("")){
                     isAdminCard = false;
                     isDuplicated_Card = false;
                 }
@@ -613,7 +626,7 @@ public class UserInfoActivity extends bpActivity implements View.OnClickListener
                     GeneralDialog.MessagePromptDialog(currActivity,"", getResources().getString(R.string.users_manage_edit_status_duplication_card));
                 }  else if(isAdminCard )
                     GeneralDialog.MessagePromptDialog(currActivity,"", getResources().getString(R.string.users_manage_edit_status_Admin_card));
-                else if(card.getText().toString().isEmpty()){
+                else if(cardStr.equals("")){
                     ByteBuffer b = ByteBuffer.allocate(BPprotocol.len_Admin_card);
 
                     b.order(ByteOrder.LITTLE_ENDIAN); // optional, the initial order of a byte buffer is always BIG_ENDIAN.
@@ -624,7 +637,7 @@ public class UserInfoActivity extends bpActivity implements View.OnClickListener
 
                 }else
                 {
-                    Long data = Long.parseLong(card.getText().toString());
+                    Long data = Long.parseLong(cardStr);
                     if( data < Long.parseLong(BPprotocol.INVALID_CARD)){
                     byte card_buffer[] = Util.hexStringToByteArray(Util.StringDecToUINT8(data));
                     Log.e("sean","user edit pwdindex="+new_User_Data.getUserIndex());
@@ -645,26 +658,68 @@ public class UserInfoActivity extends bpActivity implements View.OnClickListener
 
         final AlertDialog dialog = builder.create();
 
-        card.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        for(int i=0;i<uiCardEditID.length;i++) {
+            ArrayCard[i] = (EditText) item.findViewById(uiCardEditID[i]);
+            if(Current_User.getCard().equals(BPprotocol.spaceCardStr))
+                ArrayCard[i].setText("");
+            else
+                ArrayCard[i].setText(Current_User.getCard().substring(i,i+1));
+            ArrayCard[i].setRawInputType(currActivity.getResources().getConfiguration().KEYBOARD_12KEY);
+        }
+        for(int i=0;i<uiCardEditID.length;i++) {
+            ArrayCard[i].addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
+                }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-            }
+                }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.toString().length() != 0 && s.toString().length() != 10)
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                else
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                @Override
+                public void afterTextChanged(Editable s) {
+                    int cardNum = 0;
 
-            }
-        });
+                    for(int i=0;i<uiCardEditID.length;i++)
+                        cardNum += ArrayCard[i].length();
+                    for(int i=0;i<uiCardEditID.length;i++){
+                        if(ArrayCard[i].length() == 1 && ArrayCard[i].isFocused()&&(i < (uiCardEditID.length-1))){
+                            ArrayCard[i+1].requestFocus();
+                            Util.debugMessage(TAG,"C ArrayCard["+i+"]="+ArrayCard[i].getText().toString(),true);
+                            Util.debugMessage(TAG,"next ArrayCard["+i+1+"]="+ArrayCard[i+1].getText().toString(),true);
+                            i = uiCardEditID.length+1;
+                        }
+                    }
+                    if (cardNum != 0 && cardNum != 10)
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    else
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+
+                }
+
+
+            });
+            ArrayCard[i].setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                    if(keyCode == KeyEvent.KEYCODE_DEL) {
+                        for(int i=0;i<uiCardEditID.length;i++)
+                        {   if(ArrayCard[i].isFocused()&&i!=0 && ArrayCard[i].length() ==0)
+                            { ArrayCard[i-1].requestFocus();
+                                Util.debugMessage(TAG,"C ArrayCard["+i+"]="+ArrayCard[i].getText().toString(),true);
+                                Util.debugMessage(TAG,"next ArrayCard["+(i-1)+"]="+ArrayCard[i-1].getText().toString(),true);
+
+                                i = uiCardEditID.length+1;
+                            }
+                        }
+                    }
+                    return false;
+                }
+            });
+        }
 
         dialog.show();
     }

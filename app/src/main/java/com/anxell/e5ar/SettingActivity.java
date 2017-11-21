@@ -9,10 +9,11 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -468,7 +469,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         //dialogBuilder.setMessage(getString(R.string._4_8_digits));
 
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.my_alert_editor, null);
+        View dialogView = inflater.inflate(R.layout.admin_edit_pwd_dialog, null);
         dialogBuilder.setView(dialogView);
 
         final FontEditText editText = (FontEditText) dialogView.findViewById(R.id.editText);
@@ -563,22 +564,15 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         dialogBuilder.setTitle(R.string.settings_Admin_card_Edit);
 
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.my_alert_editor, null);
+        View dialogView = inflater.inflate(R.layout.admin_edit_card_dialog, null);
         dialogBuilder.setView(dialogView);
-
-        final FontEditText editText = (FontEditText) dialogView.findViewById(R.id.editText);
-        if(currentCard.equals(BPprotocol.spaceCardStr))
-            editText.setText("");
-        else
-            editText.setText(currentCard);
-        editText.setTextColor(Color.BLACK);
-        editText.setHint(R.string._10_digits);
-        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-
-        editText.setRawInputType(this.getResources().getConfiguration().KEYBOARD_12KEY);
-        if (editText.getText().length()>0 ) {
-            editText.setSelection(editText.getText().length());
-        }
+        final EditText ArrayCard[] = new EditText[10];
+        final int uiCardEditID []={R.id.editText_Admin_Edit_Dialog_Card1,R.id.editText_Admin_Edit_Dialog_Card2,
+                R.id.editText_Admin_Edit_Dialog_Card3,R.id.editText_Admin_Edit_Dialog_Card4,
+                R.id.editText_Admin_Edit_Dialog_Card5,R.id.editText_Admin_Edit_Dialog_Card6,
+                R.id.editText_Admin_Edit_Dialog_Card7,R.id.editText_Admin_Edit_Dialog_Card8,
+                R.id.editText_Admin_Edit_Dialog_Card9,R.id.editText_Admin_Edit_Dialog_Card10
+        };
         dialogBuilder.setPositiveButton(R.string.Confirm, null);
         dialogBuilder.setNeutralButton(R.string.cancel, null);
         final AlertDialog alertDialog = dialogBuilder.create();
@@ -592,7 +586,11 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
 
                     @Override
                     public void onClick(View view) {
-                        String newCard = editText.getText().toString();
+
+                        String newCard = "";
+                        for(int i=0;i<uiCardEditID.length;i++)
+                            newCard += ArrayCard[i].getText().toString();
+
                         Util.debugMessage(TAG,"newCard ="+newCard ,true);
                         if (TextUtils.isEmpty(newCard)) {
 
@@ -600,29 +598,29 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
 
                             b.order(ByteOrder.LITTLE_ENDIAN); // optional, the initial order of a byte buffer is always BIG_ENDIAN.
                             for(int i =0;i<BPprotocol.len_Admin_card;i++)
-                            b.put((byte)BPprotocol.nullData);
+                                b.put((byte)BPprotocol.nullData);
                             bpProtocol.setAdminCard(b.array());
                             dialog.dismiss();
                         } else {
-                            Long data = Long.parseLong(editText.getText().toString());
+                            Long data = Long.parseLong(newCard);
                             Util.debugMessage(TAG,"data="+data,true);
 
-                           if( data < Long.parseLong(BPprotocol.INVALID_CARD)){
+                            if( data < Long.parseLong(BPprotocol.INVALID_CARD)){
 
 
 
-                            boolean isDuplicated_Card= Util.checkUserDuplicateByCard(newCard, mUserDataList);
+                                boolean isDuplicated_Card= Util.checkUserDuplicateByCard(newCard, mUserDataList);
 
-                            if (isDuplicated_Card) {
-                                show_toast_msg(getResources().getString(R.string.users_manage_edit_status_duplication_card));
+                                if (isDuplicated_Card) {
+                                    show_toast_msg(getResources().getString(R.string.users_manage_edit_status_duplication_card));
 
-                             } else {
-                                byte[] card = Util.hexStringToByteArray(Util.StringDecToUINT8(data));
-                                bpProtocol.setAdminCard(card);
-                            }
+                                } else {
+                                    byte[] card = Util.hexStringToByteArray(Util.StringDecToUINT8(data));
+                                    bpProtocol.setAdminCard(card);
+                                }
 
-                           }else
-                            show_toast_msg(getResources().getString(R.string.users_manage_edit_status_Admin_card));
+                            }else
+                                show_toast_msg(getResources().getString(R.string.users_manage_edit_status_Admin_card));
 
                             dialog.dismiss();
                         }
@@ -630,36 +628,71 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
                 });
             }
         });
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        for(int i=0;i<uiCardEditID.length;i++) {
+            ArrayCard[i] = (EditText) dialogView.findViewById(uiCardEditID[i]);
+            if(currentCard.equals(BPprotocol.spaceCardStr))
+                ArrayCard[i].setText("");
+            else
+                ArrayCard[i].setText(currentCard.substring(i,i+1));
+            ArrayCard[i].setTextColor(Color.BLACK);
+            ArrayCard[i].setRawInputType(getResources().getConfiguration().KEYBOARD_12KEY);
+        }
+        for(int i=0;i<uiCardEditID.length;i++) {
+            ArrayCard[i].addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if ((s.toString().length() != BPprotocol.userCard_maxLen) && (s.toString().length() != 0))
-
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                else
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-
-
-
-
-                int bytes_len = s.toString().getBytes().length;
-                int pos = s.length();
-
-                if (bytes_len > BPprotocol.userCard_maxLen) {
-                    s.delete(pos - 1, pos);
                 }
-            }
-        });
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    int cardNum = 0;
+
+                    for (int i = 0; i < uiCardEditID.length; i++)
+                        cardNum += ArrayCard[i].length();
+                    for (int i = 0; i < uiCardEditID.length; i++) {
+                        if (ArrayCard[i].length() == 1 && ArrayCard[i].isFocused() && (i < (uiCardEditID.length - 1))) {
+                            ArrayCard[i + 1].requestFocus();
+                            Util.debugMessage(TAG, "C ArrayCard[" + i + "]=" + ArrayCard[i].getText().toString(), true);
+                            Util.debugMessage(TAG, "next ArrayCard[" + i + 1 + "]=" + ArrayCard[i + 1].getText().toString(), true);
+                            i = uiCardEditID.length + 1;
+                        }
+                    }
+                    if (cardNum != 0 && cardNum != 10)
+                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    else
+                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+
+                }
+
+
+            });
+            ArrayCard[i].setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                    if (keyCode == KeyEvent.KEYCODE_DEL) {
+                        for (int i = 0; i < uiCardEditID.length; i++) {
+                            if (ArrayCard[i].isFocused() && i != 0 && ArrayCard[i].length() == 0) {
+                                ArrayCard[i - 1].requestFocus();
+                                Util.debugMessage(TAG, "C ArrayCard[" + i + "]=" + ArrayCard[i].getText().toString(), true);
+                                Util.debugMessage(TAG, "next ArrayCard[" + (i - 1) + "]=" + ArrayCard[i - 1].getText().toString(), true);
+
+                                i = uiCardEditID.length + 1;
+                            }
+                        }
+                    }
+                    return false;
+                }
+            });
+        }
+
+
 
         alertDialog.show();
     }

@@ -3,6 +3,7 @@ package com.anxell.e5ar.transport;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.view.WindowManager;
 
 import com.anxell.e5ar.SettingActivity;
 
@@ -31,7 +32,7 @@ public class GeneralDialog {
     }
     public static void restoreCompletedDialog(final Activity currActivity, String title, String message) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(currActivity);
-
+        dialog.setCancelable(false);
         dialog.setTitle(title);
         dialog.setMessage(message);
 
@@ -43,7 +44,6 @@ public class GeneralDialog {
                 dialog.cancel();
             }
         });
-
-        dialog.show();
+      dialog.show();
     }
 }

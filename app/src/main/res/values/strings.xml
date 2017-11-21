@@ -212,5 +212,5 @@
     <string name="Level_3">Level 3</string>
     <string name="user_search_bar"></string>
     <string name="history_search_bar"></string>
-
+    <string name="EnglishCharsAndNumber">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
 </resources>
