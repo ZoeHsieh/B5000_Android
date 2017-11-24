@@ -210,7 +210,7 @@
     <string name="Level_1">Level 1</string>
     <string name="Level_2">Level 2</string>
     <string name="Level_3">Level 3</string>
-    <string name="user_search_bar"></string>
-    <string name="history_search_bar"></string>
+    <string name="UserList_search_placeHolder">Please input User ID</string>
+    <string name="History_search_placeHolder">Please input User ID</string>
     <string name="EnglishCharsAndNumber">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
 </resources>

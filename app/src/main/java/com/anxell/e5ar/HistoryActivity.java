@@ -286,7 +286,7 @@ public class HistoryActivity extends bpActivity implements View.OnClickListener,
     private void findViews() {
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         SearchView searchView = (SearchView)findViewById(R.id.histoy_searchView);
-        searchView.setQueryHint(getString(R.string.history_search_bar));
+        searchView.setQueryHint(getString(R.string.History_search_placeHolder));
         searchView.setSubmitButtonEnabled(false);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

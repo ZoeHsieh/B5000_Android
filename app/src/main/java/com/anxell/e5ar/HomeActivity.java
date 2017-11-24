@@ -1285,4 +1285,8 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         bpProtocol.getFW_version();
 
     }
+
+
+
+
 }

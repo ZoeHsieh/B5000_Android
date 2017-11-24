@@ -139,7 +139,7 @@ public class UsersListActivity extends bpActivity implements View.OnClickListene
         LinearLayout linearLayout3 = (LinearLayout) linearLayout2.getChildAt(1);
         AutoCompleteTextView autoComplete = (AutoCompleteTextView) linearLayout3.getChildAt(0);
         autoComplete.setTextSize(13);
-        searchView.setQueryHint(getString(R.string.user_search_bar));
+        searchView.setQueryHint(getString(R.string.UserList_search_placeHolder));
         searchView.setSubmitButtonEnabled(false);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

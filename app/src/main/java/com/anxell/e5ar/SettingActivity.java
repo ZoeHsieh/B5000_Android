@@ -658,9 +658,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
                     for (int i = 0; i < uiCardEditID.length; i++) {
                         if (ArrayCard[i].length() == 1 && ArrayCard[i].isFocused() && (i < (uiCardEditID.length - 1))) {
                             ArrayCard[i + 1].requestFocus();
-                            Util.debugMessage(TAG, "C ArrayCard[" + i + "]=" + ArrayCard[i].getText().toString(), true);
-                            Util.debugMessage(TAG, "next ArrayCard[" + i + 1 + "]=" + ArrayCard[i + 1].getText().toString(), true);
-                            i = uiCardEditID.length + 1;
+                                   i = uiCardEditID.length + 1;
                         }
                     }
                     if (cardNum != 0 && cardNum != 10)
@@ -680,8 +678,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
                         for (int i = 0; i < uiCardEditID.length; i++) {
                             if (ArrayCard[i].isFocused() && i != 0 && ArrayCard[i].length() == 0) {
                                 ArrayCard[i - 1].requestFocus();
-                                Util.debugMessage(TAG, "C ArrayCard[" + i + "]=" + ArrayCard[i].getText().toString(), true);
-                                Util.debugMessage(TAG, "next ArrayCard[" + (i - 1) + "]=" + ArrayCard[i - 1].getText().toString(), true);
+
 
                                 i = uiCardEditID.length + 1;
                             }
@@ -1165,7 +1162,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
                     break;
 
                 case BPprotocol.cmd_set_admin_card:
-                    Util.debugMessage(TAG,"Card data="+tmpCard,true);
+
                     update_Admin_card(tmpCard);
 
                 break;
@@ -1177,6 +1174,22 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
                 break;
 
             }
+        }else {
+            switch (cmd) {
+                case BPprotocol.cmd_set_admin_pwd:
+
+
+                    show_toast_msg(getResources().getString(R.string.users_manage_edit_status_duplication_password));
+
+
+                    break;
+                case BPprotocol.cmd_set_admin_card:
+                    show_toast_msg(getResources().getString(R.string.users_manage_edit_status_duplication_card));
+
+
+                    break;
+            }
+
         }
     }
 

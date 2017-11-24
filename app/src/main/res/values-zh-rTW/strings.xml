@@ -215,6 +215,6 @@
     <string name="Level_1">等級1</string>
     <string name="Level_2">等級2</string>
     <string name="Level_3">等級3</string>
-    <string name="user_search_bar"></string>
-    <string name="history_search_bar"></string>
+    <string name="UserList_search_placeHolder">請輸入User ID</string>
+    <string name="History_search_placeHolder">請輸入User ID</string>
 </resources>

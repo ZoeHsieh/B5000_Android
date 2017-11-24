@@ -16,7 +16,7 @@ import java.util.Locale;
  */
 
 public class Util {
-private static final boolean debugFlag = true;
+private static final boolean debugFlag = false;
 
     public static byte[] bytesToReverse(byte[] bytes) {
         byte[] result = new byte[bytes.length];
