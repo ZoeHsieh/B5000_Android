@@ -48,7 +48,7 @@
         android:maxLength="8"
         app:subject="@string/password" />
 
-    <com.anxell.e5ar.custom.MyEditText
+    <com.anxell.e5ar.custom.EditCardView
         android:id="@+id/userCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,6 +59,6 @@
         android:maxLength="10"
         app:subject="@string/Card" >
 
-    </com.anxell.e5ar.custom.MyEditText>
+    </com.anxell.e5ar.custom.EditCardView>
 
 </LinearLayout>

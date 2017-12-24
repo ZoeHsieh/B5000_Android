@@ -5,6 +5,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 
+import com.anxell.e5ar.custom.EditCardView;
 import com.anxell.e5ar.custom.MyEditText;
 import com.anxell.e5ar.custom.MyToolbar;
 import com.anxell.e5ar.data.UserData;
@@ -19,7 +20,7 @@ public class AddUserActivity extends bpActivity implements View.OnClickListener 
     private final boolean debugFlag = true;
     private MyEditText mIdET;
     private MyEditText mPasswordET;
-    private MyEditText mCardET;
+    private EditCardView mCardET;
     private  MyToolbar toolbar;
     private boolean isADDOK = false;
     private int mFrom;
@@ -82,38 +83,18 @@ public class AddUserActivity extends bpActivity implements View.OnClickListener 
 
             }
         });
-        if(APPConfig.deviceType != APPConfig.deviceType_Keypad){
-        mCardET = (MyEditText)findViewById(R.id.userCard);
-        mCardET.setRawInputType(this.getResources().getConfiguration().KEYBOARD_12KEY);
-            mCardET.setTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        if(APPConfig.deviceType != APPConfig.deviceType_Keypad)
+        mCardET = (EditCardView) findViewById(R.id.userCard);
 
-                }
 
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    isUserDataLength();
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-
-                }
-            });
-        }
     }
     private void isUserDataLength(){
 
-        if ((mPasswordET.getText().length() <4) || (mIdET.getText().isEmpty() ) || ((!mCardET.getText().isEmpty()) &&  (mCardET.getText().length() != BPprotocol.userCard_maxLen ))) {
-            isADDOK = false;
 
-        }else
-            isADDOK = true;
-        Util.debugMessage(TAG,"flag="+((mPasswordET.getText().length() <4) && (mIdET.getText().isEmpty() )&&((!mCardET.getText().isEmpty()) &&  (mCardET.getText().length() != BPprotocol.userCard_maxLen ))),true);
+        Util.debugMessage(TAG,"flag="+((mPasswordET.getText().length() <4) && (mIdET.getText().isEmpty() )&&((!mCardET.getCard().isEmpty()) &&  (mCardET.getCard().length() != BPprotocol.userCard_maxLen ))),true);
 
 
-        toolbar.setRightEnableColor(isADDOK);
+
     }
 
 
@@ -128,7 +109,15 @@ public class AddUserActivity extends bpActivity implements View.OnClickListener 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.rightTV:
+                if ((mPasswordET.getText().length() <4) || (mIdET.getText().isEmpty() ) || ((!mCardET.getCard().isEmpty()) &&  (mCardET.getCard().length() != BPprotocol.userCard_maxLen ))) {
+                    isADDOK = false;
+
+                }else
+                    isADDOK = true;
+
+                toolbar.setRightEnableColor(isADDOK);
                 if(isADDOK){
+
                     if (isOkForData()) {
                         saveData();
                     }
@@ -149,7 +138,7 @@ public class AddUserActivity extends bpActivity implements View.OnClickListener 
         String card = "";
         if(APPConfig.deviceType != APPConfig.deviceType_Keypad){
             currAdminCARD = sharedPreferences.getString(APPConfig.ADMINCARD_Tag + device_BDADDR, "");
-            card = mCardET.getText();
+            card = mCardET.getCard();
         }
 
         boolean isDuplicated_Name = Util.checkUserDuplicateByName( id, mUserDataList);
@@ -201,8 +190,8 @@ public class AddUserActivity extends bpActivity implements View.OnClickListener 
         if(APPConfig.deviceType == APPConfig.deviceType_Keypad)
             UsersListActivity.userInfoData = new UserData(mIdET.getText(),mPasswordET.getText(),BPprotocol.spaceCardStr,0);
         else {
-            if(!mCardET.getText().isEmpty())
-                UsersListActivity.userInfoData = new UserData(mIdET.getText(), mPasswordET.getText(), mCardET.getText(), 0);
+            if(!mCardET.getCard().isEmpty())
+                UsersListActivity.userInfoData = new UserData(mIdET.getText(), mPasswordET.getText(), mCardET.getCard(), 0);
             else
                 UsersListActivity.userInfoData = new UserData(mIdET.getText(), mPasswordET.getText(), BPprotocol.spaceCardStr, 0);
 
