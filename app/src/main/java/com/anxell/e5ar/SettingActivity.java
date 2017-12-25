@@ -832,6 +832,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         int currLevel = APPConfig.Convert_RSSI_to_LEVEL(Integer.parseInt(rssi));
         intent.putExtra(APPConfig.RSSI_LEVEL_Tag,currLevel);
         intent.putExtra(APPConfig.deviceBddrTag,deviceBDDR);
+
         Util.debugMessage(TAG,"RSSI="+rssi+"deviceBDDR="+deviceBDDR,debugFlag);
 
         startActivity(intent);
@@ -967,7 +968,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
             break;
             case BPprotocol.cmd_device_bd_addr:
 
-                APPConfig.deviceType = APPConfig.deviceType_Card;
+                //APPConfig.deviceType = APPConfig.deviceType_Card;
 
 
 

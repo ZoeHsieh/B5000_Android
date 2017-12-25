@@ -6,10 +6,16 @@ import android.view.View;
 import android.widget.SeekBar;
 
 import com.anxell.e5ar.custom.FontTextView;
+import com.anxell.e5ar.transport.APPConfig;
+import com.anxell.e5ar.transport.bpActivity;
+import com.anxell.e5ar.util.Util;
 
-public class ProximityReadRangeActivity1 extends BaseActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class ProximityReadRangeActivity1 extends bpActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     private FontTextView mDeviceDistanceTV;
+    private FontTextView mDeviceCurrDistanceTV;
+    private SeekBar expectLEVELBar;
+    private String deviceBDAddr;;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,10 +24,21 @@ public class ProximityReadRangeActivity1 extends BaseActivity implements View.On
 
         findViews();
         setListeners();
+        Intent intent = getIntent();
+        int currLevel = intent.getIntExtra(APPConfig.RSSI_LEVEL_Tag, 0);
+        Util.debugMessage("Proximity","curr rssi="+currLevel,true);
+        deviceBDAddr = intent.getStringExtra(APPConfig.deviceBddrTag);
+        mDeviceCurrDistanceTV.setText(""+currLevel);
+        int expectLevel = loadDeviceRSSILevel(deviceBDAddr);
+        mDeviceDistanceTV.setText(""+expectLevel);
+        expectLEVELBar.setProgress(expectLevel);
+        expectLEVELBar.setMax(20);
     }
 
     private void findViews() {
         mDeviceDistanceTV = (FontTextView) findViewById(R.id.deviceDistanceValue);
+        mDeviceCurrDistanceTV = (FontTextView) findViewById(R.id.deviceDistance);
+        expectLEVELBar = (SeekBar)findViewById(R.id.proximity_expect_seekBar);
     }
 
     private void setListeners() {

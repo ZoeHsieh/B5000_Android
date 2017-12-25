@@ -32,7 +32,13 @@ public class APPConfig {
     public static final String isAutoTag = "isAutoTag";
     public static final String ADMINPWD_Tag = ADMIN_ID+"PWD";
     public static final String ADMINCARD_Tag = ADMIN_ID+"CARD";
-    public static String deviceType = "";
+    /*E5AK
+    * deviceType = APPConfig.deviceType_Keypad_Card
+    *
+    * E5AR
+    * deviceType = APPConfig.ddeviceType_Card
+    * */
+    public static String deviceType = APPConfig.deviceType_Keypad_Card;
     public static final String deviceType_Keypad = "Keypad";
     public static final String deviceType_Card = "Card";
     public static final String deviceType_Keypad_Card = "Keypad_Card";

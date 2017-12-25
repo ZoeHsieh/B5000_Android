@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.anxell.e5ar.custom.EditCardView;
 import com.anxell.e5ar.custom.MyEditText;
+import com.anxell.e5ar.custom.MyTextWatcher;
 import com.anxell.e5ar.custom.MyToolbar;
 import com.anxell.e5ar.data.UserData;
 import com.anxell.e5ar.transport.APPConfig;
@@ -42,62 +43,71 @@ public class AddUserActivity extends bpActivity implements View.OnClickListener 
         mFrom = bundle.getInt("from");
         device_BDADDR = bundle.getString(APPConfig.deviceBddrTag);
         toolbar.setRightEnableColor(false);
+
     }
 
     private void findViews() {
         mIdET = (MyEditText) findViewById(R.id.id);
         mPasswordET = (MyEditText) findViewById(R.id.password);
-        mIdET.setTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                isUserDataLength();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-
-
-
-            }
-        });
+        mIdET.setTextChangedListener(textWatcher);
         mPasswordET.setRawInputType(this.getResources().getConfiguration().KEYBOARD_12KEY);
-        mPasswordET.setTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                isUserDataLength();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        if(APPConfig.deviceType != APPConfig.deviceType_Keypad)
+        mPasswordET.setTextChangedListener(textWatcher);
+        if(APPConfig.deviceType != APPConfig.deviceType_Keypad){
         mCardET = (EditCardView) findViewById(R.id.userCard);
+            mCardET.initCardView(BPprotocol.spaceCardStr);
+            mCardET.setTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    isUserDataLength();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    mCardET.moveCursor();
+                }
+            });
+        }
 
 
     }
     private void isUserDataLength(){
 
+        if ((mPasswordET.getText().length() <4) || (mIdET.getText().isEmpty() ) || ((!mCardET.getCard().isEmpty()) &&  (mCardET.getCard().length() != BPprotocol.userCard_maxLen ))) {
+            isADDOK = false;
 
+        }else
+            isADDOK = true;
+        toolbar.setRightEnableColor(isADDOK);
         Util.debugMessage(TAG,"flag="+((mPasswordET.getText().length() <4) && (mIdET.getText().isEmpty() )&&((!mCardET.getCard().isEmpty()) &&  (mCardET.getCard().length() != BPprotocol.userCard_maxLen ))),true);
 
 
 
     }
 
+    private TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            isUserDataLength();
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+
+
+
+        }
+    };
     private void setListeners() {
         toolbar = (MyToolbar) findViewById(R.id.toolbarView);
         toolbar.hideNavigationIcon();
@@ -109,11 +119,7 @@ public class AddUserActivity extends bpActivity implements View.OnClickListener 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.rightTV:
-                if ((mPasswordET.getText().length() <4) || (mIdET.getText().isEmpty() ) || ((!mCardET.getCard().isEmpty()) &&  (mCardET.getCard().length() != BPprotocol.userCard_maxLen ))) {
-                    isADDOK = false;
 
-                }else
-                    isADDOK = true;
 
                 toolbar.setRightEnableColor(isADDOK);
                 if(isADDOK){

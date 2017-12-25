@@ -26,7 +26,7 @@ public class ProximityReadRangeActivity2 extends bpActivity implements SeekBar.O
         int currLevel = intent.getIntExtra(APPConfig.RSSI_LEVEL_Tag, 0);
         Util.debugMessage("Proximity","curr rssi="+currLevel,true);
         deviceBDAddr = intent.getStringExtra(APPConfig.deviceBddrTag);
-        mDeviceDistanceTV.setText(""+currLevel);
+        mDeviceCurrDistanceTV.setText(""+currLevel);
         int expectLevel = loadDeviceRSSILevel(deviceBDAddr);
         mDeviceDistanceTV.setText(""+expectLevel);
         expectLEVELBar.setProgress(expectLevel);

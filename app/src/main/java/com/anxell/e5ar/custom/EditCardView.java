@@ -36,11 +36,11 @@ public class EditCardView extends FrameLayout {
     private LinearLayout mLayOut;
     private String newCard = "";
     final EditText ArrayCard[] = new EditText[10];
-    final int uiCardEditID []={R.id.editText_Admin_Edit_Dialog_Card1,R.id.editText_Admin_Edit_Dialog_Card2,
-            R.id.editText_Admin_Edit_Dialog_Card3,R.id.editText_Admin_Edit_Dialog_Card4,
-            R.id.editText_Admin_Edit_Dialog_Card5,R.id.editText_Admin_Edit_Dialog_Card6,
-            R.id.editText_Admin_Edit_Dialog_Card7,R.id.editText_Admin_Edit_Dialog_Card8,
-            R.id.editText_Admin_Edit_Dialog_Card9,R.id.editText_Admin_Edit_Dialog_Card10
+    final int uiCardEditID []={R.id.editText_Users_Edit_Dialog_Card1,R.id.editText_Users_Edit_Dialog_Card2,
+            R.id.editText_Users_Edit_Dialog_Card3,R.id.editText_Users_Edit_Dialog_Card4,
+            R.id.editText_Users_Edit_Dialog_Card5,R.id.editText_Users_Edit_Dialog_Card6,
+            R.id.editText_Users_Edit_Dialog_Card7,R.id.editText_Users_Edit_Dialog_Card8,
+            R.id.editText_Users_Edit_Dialog_Card9,R.id.editText_Users_Edit_Dialog_Card10
     };
     public EditCardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -73,22 +73,20 @@ public class EditCardView extends FrameLayout {
 
 
 
-
-                        for(int i=0;i<uiCardEditID.length;i++)
-                            newCard += ArrayCard[i].getText().toString();
-
-
-
-        for(int i=0;i<uiCardEditID.length;i++) {
+        for(int i=0;i<uiCardEditID.length;i++)
             ArrayCard[i] = (EditText) findViewById(uiCardEditID[i]);
-            if(currentCard.equals(BPprotocol.spaceCardStr))
+       for(int i=0;i<uiCardEditID.length;i++){
+           if(currentCard.length()< uiCardEditID.length)
                 ArrayCard[i].setText("");
             else
                 ArrayCard[i].setText(currentCard.substring(i,i+1));
             ArrayCard[i].setTextColor(Color.BLACK);
             ArrayCard[i].setRawInputType(getResources().getConfiguration().KEYBOARD_12KEY);
         }
-        for(int i=0;i<uiCardEditID.length;i++) {
+       for(int i=0;i<uiCardEditID.length;i++)
+           newCard += ArrayCard[i].getText().toString();
+
+       for(int i=0;i<uiCardEditID.length;i++) {
             ArrayCard[i].addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -103,12 +101,7 @@ public class EditCardView extends FrameLayout {
                 @Override
                 public void afterTextChanged(Editable s) {
 
-                    for (int i = 0; i < uiCardEditID.length; i++) {
-                        if (ArrayCard[i].length() == 1 && ArrayCard[i].isFocused() && (i < (uiCardEditID.length - 1))) {
-                            ArrayCard[i + 1].requestFocus();
-                            i = uiCardEditID.length + 1;
-                        }
-                    }
+
 
 
                 }
@@ -135,6 +128,20 @@ public class EditCardView extends FrameLayout {
         }
     }
 
+    public void setTextChangedListener(TextWatcher watcher){
+        for(int i=0;i<uiCardEditID.length;i++)
+            ArrayCard[i].addTextChangedListener(watcher);
+
+    }
+    public void moveCursor(){
+        for (int i = 0; i < uiCardEditID.length; i++) {
+            if (ArrayCard[i].length() == 1 && ArrayCard[i].isFocused() && (i < (uiCardEditID.length - 1))) {
+                ArrayCard[i + 1].requestFocus();
+                i = uiCardEditID.length + 1;
+            }
+        }
+
+    }
     public void setCard(String cardStr) {
 
         for(int i=0;i<uiCardEditID.length;i++) {
