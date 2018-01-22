@@ -22,7 +22,7 @@ import com.anxell.e5ar.util.Util;
 
 public class UserSettingActivity extends bpActivity implements View.OnClickListener {
     private String TAG = UserSettingActivity.class.getSimpleName().toString();
-    private Boolean debugFlag = true;
+    private Boolean debugFlag = false;
     private My4TextView mDeviceNameTV;
     private My2TextView mDeviceTimeTV;
     private My4TextView mDoorReLockTimeTV;
@@ -37,6 +37,7 @@ public class UserSettingActivity extends bpActivity implements View.OnClickListe
     private FontTextView versionTV;
     private ProgressBar loadDeviceDataBar;
     private String deviceBDDR = "";
+    private String deviceModel = "";
     private double vr = 0.0;
     private double vrLimit = 1.02;
     /*------------------------*/
@@ -54,6 +55,7 @@ public class UserSettingActivity extends bpActivity implements View.OnClickListe
         savedInstanceState = this.getIntent().getExtras();
         String deviceName = savedInstanceState.getString(APPConfig.deviceNameTag);
         deviceBDDR = savedInstanceState.getString(APPConfig.deviceBddrTag);
+        deviceModel = savedInstanceState.getString(APPConfig.deviceModelTag);
         int rssi = savedInstanceState.getInt(APPConfig.RSSI_LEVEL_Tag);
         curr_rssi_level = APPConfig.Convert_RSSI_to_LEVEL(rssi);
         mDeviceNameTV.setValue(deviceName);
@@ -163,6 +165,7 @@ public class UserSettingActivity extends bpActivity implements View.OnClickListe
 
     private void openAboutUsPage() {
         Intent intent = new Intent(this, AboutUsActivity.class);
+        intent.putExtra(APPConfig.deviceModelTag,deviceModel);
         startActivity(intent);
         overridePendingTransitionRightToLeft();
     }

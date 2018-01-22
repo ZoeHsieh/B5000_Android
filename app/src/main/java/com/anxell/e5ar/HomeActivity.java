@@ -40,6 +40,7 @@ import com.anxell.e5ar.transport.bpActivity;
 import com.anxell.e5ar.util.Util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -356,15 +357,60 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
             //Util.debugMessage(TAG,"onScanResult: NEW Address = [" + result.getDevice().getAddress() + "], RSSI = " + result.getRssi() + ".",debugFlag);
 
-           // Util.debugMessage(TAG, "onScanResult: Check RSSI. Taget = " + AutoMode_DetectRSSI + ", Device = " + result.getRssi() + ".",debugFlag);
+            // Util.debugMessage(TAG, "onScanResult: Check RSSI. Taget = " + AutoMode_DetectRSSI + ", Device = " + result.getRssi() + ".",debugFlag);
             //Util.debugMessage(TAG,"deviceName="+result.getDevice().getName(),debugFlag);
             //Reload Period Scan Refresh Count
-          //  mPeriodScanRefreshCnt = mPeriodScanRefresh_Max;
+            //  mPeriodScanRefreshCnt = mPeriodScanRefresh_Max;
             BluetoothDevice test = mBluetoothAdapter.getRemoteDevice(result.getDevice().getAddress());
-           // Util.debugMessage(TAG,"test deviceName="+test.getName()+"bd Addr="+test.getAddress(),debugFlag);
+            // Util.debugMessage(TAG,"test deviceName="+test.getName()+"bd Addr="+test.getAddress(),debugFlag);
 
+            byte rawData[] = result.getScanRecord().getBytes();
+            if (debugFlag) {
+                int count = 0;
+                for (byte tmp : rawData){
+                    Util.debugMessage(TAG, String.format("Data[%d]=%02x", count, tmp), true);
+                count++;
+                }
+            }
+            //device advertising Raw Data
+            String customID = Util.bytesToHex(Arrays.copyOfRange(rawData,33,35));
+            Util.debugMessage(TAG,"customID="+customID,debugFlag);
+            String deviceModel = Util.bytesToHex(Arrays.copyOfRange(rawData,35,37));
+            Util.debugMessage(TAG,"deviceModel="+deviceModel,debugFlag);
+            String deviceCategory = Util.bytesToHex(Arrays.copyOfRange(rawData,37,38));
+            Util.debugMessage(TAG,"deviceCategory="+deviceCategory,debugFlag);
+            String deviceColor = Util.bytesToHex(Arrays.copyOfRange(rawData,39,41));
+            Util.debugMessage(TAG,"deviceColor="+deviceColor,debugFlag);
+            String deviceReserved = Util.bytesToHex(Arrays.copyOfRange(rawData,41,42));
+            Util.debugMessage(TAG,"deviceReserved="+deviceReserved,debugFlag);
+
+            String customIDStr = (String)APPConfig.advertisingData.CUSTOM_IDs.get(customID.toUpperCase());
+            if(customIDStr==null)
+                return;
+            Util.debugMessage(TAG,"customIDStr="+customIDStr,debugFlag);
+            String deviceModelStr = (String)APPConfig.advertisingData.dev_Model.get(deviceModel.toUpperCase());
+            if(deviceModelStr==null)
+                return;
+            Util.debugMessage(TAG,"deviceModelStr="+deviceModelStr,debugFlag);
+            String deviceCategoryStr = (String)APPConfig.advertisingData.dev_Category.get(deviceCategory.toUpperCase());
+            if(deviceCategory==null)
+                return;
+            Util.debugMessage(TAG,"deviceCategoryStr="+deviceCategoryStr,debugFlag);
+            String deviceColorStr = (String)APPConfig.advertisingData.dev_Color.get(deviceColor.toUpperCase());
+            if (deviceColor==null)
+                return;
+            Util.debugMessage(TAG,"deviceColorStr="+deviceColorStr,debugFlag);
+            String deviceReservedStr = (String)APPConfig.advertisingData.dev_Reserved.get(deviceReserved.toUpperCase());
+            if(deviceReservedStr==null)
+                return;
+            Util.debugMessage(TAG,"deviceReservedStr="+deviceReservedStr,debugFlag);
+
+            if(!APPConfig.CustomID.equals(customIDStr))
+                return;
+            if(!deviceModelStr.contains(APPConfig.deviceSeries))
+                return;
             if(result.getDevice().getAddress().toString().substring(0,8).equals(BPprotocol.bp_address)) {
-                ScanItem tmpScanItem_FullRange = new ScanItem(result.getDevice().getName(), result.getDevice().getAddress(), result.getRssi(), 5);
+                ScanItem tmpScanItem_FullRange = new ScanItem(result.getDevice().getName(), result.getDevice().getAddress(),customIDStr,deviceModelStr,deviceCategoryStr,deviceColorStr,deviceReserved, result.getRssi(), 5);
                 //Util.debugMessage(TAG, "deviceName=" + result.getDevice().getName(), debugFlag);
 
 
@@ -592,9 +638,10 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
                             sharedPreferences.edit().putBoolean(getBluetoothDeviceAddress(), false).commit();
 
+                            show_toast_msg(getString(R.string.eroll_success));
 
                         } else {
-
+                            show_toast_msg(getString(R.string.eroll_fail));
                             Util.debugMessage(TAG, "Enroll fail",debugFlag);
                         }
 
@@ -641,11 +688,31 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                         break;
                     case BPprotocol.cmd_admin_enroll:
 
-
-                        if (data[0] == BPprotocol.result_success)
+                        if (data[0] == BPprotocol.result_success) {
+                            show_toast_msg(getString(R.string.eroll_success));
                             sharedPreferences.edit().putBoolean(getBluetoothDeviceAddress(), true).apply();
-                        else
-                            Util.debugMessage(TAG,"ADMIN ENROLL FAIL",debugFlag);
+                        }
+                        else {
+                            show_toast_msg(getString(R.string.eroll_fail));
+                            Util.debugMessage(TAG, "ADMIN ENROLL FAIL", debugFlag);
+                        }
+                        break;
+
+                    case BPprotocol.cmd_admin_indentify:
+                    case BPprotocol.cmd_user_indentify:
+                        if(!isAutoMode){
+                            switch(data[0]){
+
+                                case BPprotocol.open_fail_no_eroll:
+                                    show_toast_msg(getString(R.string.open_fail_no_eroll));
+                                    break;
+
+                                case BPprotocol.open_fail_PD:
+                                    show_toast_msg(getString(R.string.open_fail_permission_denied));
+                                    break;
+
+                            }
+                        }
 
                         break;
 
@@ -1015,10 +1082,12 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         Util.debugMessage(TAG,"deviceName = "+selectDevice.getName(),debugFlag);
         Util.debugMessage(TAG,"BDAddr ="+selectDevice.getAddress(),debugFlag);
         boolean isAdmin = sharedPreferences.getBoolean(selectDevice.getAddress(), false);
-
+        ScanItem deviceInfo = getDeviceInfo(selectDevice);
+        APPConfig.deviceCategory = deviceInfo.Category;
         Bundle postman = new Bundle();
         postman.putString(APPConfig.deviceNameTag, selectDevice.getName());
         postman.putString(APPConfig.deviceBddrTag,selectDevice.getAddress());
+        postman.putString(APPConfig.deviceModelTag,deviceInfo.Model);
         if(!isAdmin){
          int RSSI = getTargetCurrRSSI(selectDevice.getAddress());
 
@@ -1232,6 +1301,24 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
         return target;
     }
+
+
+    private ScanItem getDeviceInfo(BluetoothDevice device){
+
+
+            int foundIndex = 0;
+            for(int i =0; i<deviceInfoList.size();i++){
+                if(deviceInfoList.scanItems.get(i).dev_addr.equals(device.getAddress())){
+                    foundIndex = i ;
+                    break;
+                }
+            }
+
+
+
+        return deviceInfoList.scanItems.get(foundIndex);
+    }
+
     private int getTargetCurrRSSI(String bdAddr){
 
         for(int i=0;i<deviceInfoList.size();i++){

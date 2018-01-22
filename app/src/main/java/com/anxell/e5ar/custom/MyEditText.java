@@ -3,7 +3,9 @@ package com.anxell.e5ar.custom;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.NumberKeyListener;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.inputmethod.EditorInfo;
@@ -71,6 +73,22 @@ public class MyEditText extends FrameLayout {
     }
     public void setInputType(int type){
         mValueET.setInputType(type);
+        NumberKeyListener myKeyListener = new NumberKeyListener() {
+            public int getInputType()
+            {
+                //指定键盘类型
+                return InputType.TYPE_CLASS_PHONE;
+            }
+
+            protected char[] getAcceptedChars()
+            {
+                //指定你所接受的字符
+                String txt = "1234567890";
+                return txt.toCharArray();
+            }
+        };
+
+        mValueET.setKeyListener(myKeyListener);
     }
 
     public void setViewFocusable(boolean enable){

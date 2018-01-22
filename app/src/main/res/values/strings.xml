@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">E5AR</string>
+    <string name="app_name">E5AKR</string>
 
     <string name="bluetooth_access_control_system">Bluetooth Access Control System</string>
     <string name="anxell_technology_coproration">&#169; 2017 Anxell Technology Coproration</string>
@@ -17,7 +17,7 @@
     <string name="please_enter_account">Your ID</string>
     <string name="please_enter_password">Passcode</string>
     <string name="you_can_find_the_password_from_the_manual">You can find default passcode from the manual. Please change your Admin passcode for security control.</string>
-    <string name="there_is_no_users">There\'s no users, add now?</string>
+    <string name="there_is_no_users">There\'s no user. Tap "Add" to add new users.</string>
 
     <string name="add">Add</string>
 
@@ -25,8 +25,8 @@
     <string name="cancel">Cancel</string>
     <string name="model">%1$s</string>
     <string name="choose_device">Please Choose </string>
-    <string name="door_closed">DOOR CLOSED</string>
-    <string name="door_opened">DOOR OPENED</string>
+    <string name="door_closed">LOCKED</string>
+    <string name="door_opened">UNLOCKED</string>
     <string name="open">OPEN</string>
     <string name="automatic_sensor_to_open">Auto</string>
 
@@ -38,8 +38,8 @@
     <string name="device_name">Device Name</string>
     <string name="settings_Admin_pwd">Admin Passcode</string>
     <string name="settings_Admin_pwd_Edit">Edit Admin Passcode</string>
-    <string name="settings_Admin_card" >Admin Card</string>
-    <string name="settings_Admin_card_Edit">Edit Admin Card</string>
+    <string name="settings_Admin_card" >Admin Card/Fob</string>
+    <string name="settings_Admin_card_Edit">Edit Admin Card/Fob</string>
     <string name="users_manage_edit_status_duplication_password">Passcode Duplication!!</string>
     <string name="door_sensor">Door Sensor</string>
     <string name="door_lock_action">Lock Action</string>
@@ -48,7 +48,7 @@
     <string name="always_unlocked">Door Always Unlocked</string>
     <string name="always_locked">Door Always Locked</string>
 
-    <string name="tamper_sensor">Tamper Sensor</string>
+    <string name="tamper_sensor">Tamper Alarm</string>
     <string name="tamper_sensor_Level">Tamper Sensor Level</string>
     <string name="proximity_read_range">Proximity Read Range</string>
     <string name="door_re_lock_time">Door Re-lock Time</string>
@@ -74,8 +74,8 @@
     <string name="user_name">ID</string>
 
     <string name="add_user">Add Users</string>
-    <string name="Please_Provide_Up_to_16_characters">Up to 16 characters</string>
-    <string name="_4_8_digits">4~8 digits</string>
+    <string name="Please_Provide_Up_to_16_characters">ID: Up to 16 characters</string>
+    <string name="_4_8_digits">Passcode: 4~8 digits</string>
     <string name="_10_digits">10 digits</string>
     <string name="user_name_optional">使用者名稱 &#040;非必填&#041;</string>
 
@@ -162,7 +162,7 @@
     <string name="download_dialog_message">Loading...</string>
     <string name="enable_keypad_pin_code_to_access">Keypad Access</string>
     <string name="enable_phone_access">Phone Access</string>
-    <string name="enable_card_access">Card Access</string>
+    <string name="enable_card_access">Card/Fob Access</string>
     <string name="every_week">Every Week</string>
     <string name="Enroll">Login</string>
     <string name="Permanent">Permanent</string>
@@ -182,7 +182,7 @@
     <string name="program_success">Success</string>
     <string name="program_fail">Fail</string>
     <string name="Device_Model">Device Model:</string>
-    <string name="openType_Card">Card</string>
+    <string name="openType_Card">Card/Fob</string>
     <string name="openType_Button">Button</string>
     <string name="openType_Alarm">Alarm</string>
     <string name="openType_Keypad">Keypad</string>
@@ -193,17 +193,17 @@
     <string name="no_user_note">There\'s no users!!</string>
     <string name="users_manage_edit_status_Admin_name">Invalid ID !!</string>
     <string name="users_manage_edit_status_Admin_pwd">Invalid Passcode!!</string>
-    <string name="users_manage_edit_status_Admin_card">Invalid Card!!</string>
+    <string name="users_manage_edit_status_Admin_card">Invalid Card/Fob!!</string>
     <string name="users_manage_edit_status_duplication_name">ID Duplication!!</string>
-    <string name="users_manage_edit_status_duplication_card">Card Duplication!!</string>
+    <string name="users_manage_edit_status_duplication_card">Card/Fob Duplication!!</string>
     <string name="ID">ID</string>
     <string name="Password">Passcode</string>
-    <string name="Card">Card</string>
+    <string name="Card">Card/Fob</string>
 
     <string name="users_edit_access_control_dialog_type_times_mark">Current number of times:</string>        
     <string name="users_id_edit_dialog_title">Edit ID: (16 characters)</string>
     <string name="users_pwd_edit_dialog_title">Edit Passcode: (4~8 digits)</string>
-    <string name="users_card_edit_dialog_title">Edit Card: (10 digits)</string>
+    <string name="users_card_edit_dialog_title">Edit Card/Fob: (10 digits)</string>
     <string name="Confirm">Confirm</string>
     <string name="APP_version">APP version:</string>
     <string name="over_range_alarm">Over range</string>
@@ -213,4 +213,9 @@
     <string name="UserList_search_placeHolder">Please input User ID</string>
     <string name="History_search_placeHolder">Please input User ID</string>
     <string name="EnglishCharsAndNumber">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+
+    <string name="open_fail_permission_denied">Access Denied. Please Contact Your Administrator.</string>
+    <string name="open_fail_no_eroll">Access Denied. Please Login First to Get Access.</string>
+    <string name="eroll_fail">Login Failed. Please Verify Your Login Information Or Contact Your Administrator.</string>
+    <string name="eroll_success">You Have Successfully Logged In. You May Now Unlock A Door.</string>
 </resources>

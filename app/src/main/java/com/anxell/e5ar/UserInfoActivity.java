@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -116,6 +117,14 @@ public class UserInfoActivity extends bpActivity implements View.OnClickListener
                     mCardSwitch.setVisibility(View.VISIBLE);
                 }
                 mLimitTypeTV = (My2TextView) findViewById(R.id.limitType);
+
+
+        mIDETV.findViewById(R.id.value).setFocusable(false);
+        mIDETV.findViewById(R.id.value).setFocusableInTouchMode(false);
+        mPWDETV.findViewById(R.id.value).setFocusable(false);
+        mPWDETV.findViewById(R.id.value).setFocusableInTouchMode(false);
+        mCARDETV.findViewById(R.id.value).setFocusable(false);
+        mCARDETV.findViewById(R.id.value).setFocusableInTouchMode(false);
 
             }
 
@@ -720,8 +729,10 @@ public class UserInfoActivity extends bpActivity implements View.OnClickListener
                 }
             });
         }
-
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         dialog.show();
+
+
     }
 
 

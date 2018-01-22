@@ -18,7 +18,7 @@ public class APPConfig {
     public static final int	E3K_DEVICES_BLE_RSSI_LEVEL_SCALE = E3K_DEVICES_BLE_RSSI_LEVEL_MAX - E3K_DEVICES_BLE_RSSI_LEVEL_MIN;
     public static final int	E3K_DEVICES_BLE_RSSI_LEVEL_CONVERT_BASE = E3K_DEVICES_BLE_RSSI_SCALE / E3K_DEVICES_BLE_RSSI_LEVEL_SCALE;
     public static final int	E3K_DEVICES_BLE_RSSI_DETECT_DEFAULT = Convert_LEVEL_to_RSSI(E3K_DEVICES_BLE_RSSI_LEVEL_DEFAULT);
-
+    public static final AdvertisingData advertisingData = new AdvertisingData();
     public static final String RSSI_LEVEL_Tag = "RSSI";
     public static final String RSSI_DB_EXIST = "RSSI_EXIST";
     public static final int PROCESS_THREAD_PRIORITY = Process.THREAD_PRIORITY_DEFAULT;
@@ -29,6 +29,8 @@ public class APPConfig {
     public static final int  conTimeOut = 15000;
     public static final String deviceNameTag = "deviceNameTag";
     public static final String deviceBddrTag = "bdAddrTag";
+    public static final String deviceModelTag = "modelTag";
+    public static  String deviceCategory = "";
     public static final String isAutoTag = "isAutoTag";
     public static final String ADMINPWD_Tag = ADMIN_ID+"PWD";
     public static final String ADMINCARD_Tag = ADMIN_ID+"CARD";
@@ -46,7 +48,8 @@ public class APPConfig {
     public static final int loginCMDCntMax = 9;
     public static final int backupCMDCntMax = 4; //(not include user data)
     public static final int restoreCMDCntMax = 6;
-
+    public static final String deviceSeries = "E5";
+    public static final String CustomID = (String)APPConfig.advertisingData.CUSTOM_IDs.get("FFFF");
     public static int Convert_RSSI_to_LEVEL(int rssi)
     {
         return ((rssi - E3K_DEVICES_BLE_RSSI_MIN) / E3K_DEVICES_BLE_RSSI_LEVEL_CONVERT_BASE);

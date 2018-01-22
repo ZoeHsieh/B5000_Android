@@ -11,7 +11,9 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -60,6 +62,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
     //private int mProgressStatus = 0;
     //private Handler handler = new Handler();
     private String deviceBDDR = "";
+    private String deviceModel = "";
     private int userMax = 0;
     private String mDevice_FW_Version = "";
     private double vr = 0.0;
@@ -108,6 +111,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         savedInstanceState = this.getIntent().getExtras();
         String deviceName = savedInstanceState.getString(APPConfig.deviceNameTag);
         deviceBDDR = savedInstanceState.getString(APPConfig.deviceBddrTag);
+        deviceModel = savedInstanceState.getString(APPConfig.deviceModelTag);
         mDeviceNameTV.setValue(deviceName);
         int expectLevel = loadDeviceRSSILevel(deviceBDDR);
         mExpectLEVELTV.setValue(""+expectLevel);
@@ -207,13 +211,30 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         findViewById(R.id.doorLockAction).setOnClickListener(this);
         findViewById(R.id.proximityReadRange).setOnClickListener(this);
         mDoorReLockTimeTV.setOnClickListener(this);
-        mDeviceTimeTV.setOnClickListener(this);
+//        mDeviceTimeTV.setOnClickListener(this);
         mAdminCardTV.setOnClickListener(this);
         mAdminPWDTV.setOnClickListener(this);
         mTampLevelTV.setOnClickListener(this);
         mTampSwitch.setOnClickListener(this);
         mDoorSwitch.setOnClickListener(this);
         findViewById(R.id.aboutUs).setOnClickListener(this);
+
+
+        settingUI.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    setcurrentdate();
+                }
+
+                return false;
+            }
+        });
+
+
     }
 
     @Override
@@ -389,6 +410,8 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
 
     private void openAboutUsPage() {
         Intent intent = new Intent(this, AboutUsActivity.class);
+
+        intent.putExtra(APPConfig.deviceModelTag,deviceModel);
         startActivity(intent);
         overridePendingTransitionRightToLeft();
     }
@@ -690,7 +713,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         }
 
 
-
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
     }
     private void showReLockTimeDialog(String currentTime) {
@@ -1348,7 +1371,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         mTampSwitch.setSwitchCheck(tamper_opt);
         currConfig = data;
 
-
+        setcurrentdate();
     }
     private void update_Device_Sensor_Degree(byte sensor_Level){
 
@@ -1459,6 +1482,21 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
             },APPConfig.conTimeOut);
 
         }
+    }
+
+
+
+    public static void setcurrentdate(){
+        Calendar calendar = Calendar.getInstance();
+        SettingActivity.tmpTime[0] = (byte) (calendar.get(Calendar.YEAR) >> 8);
+        SettingActivity.tmpTime[1] = (byte) (calendar.get(Calendar.YEAR) & 0xFF);
+        SettingActivity.tmpTime[2] = (byte)((calendar.get(Calendar.MONTH) &0xFF)+1);
+        SettingActivity.tmpTime[3] = (byte)(calendar.get(Calendar.DAY_OF_MONTH) &0xFF);
+        SettingActivity.tmpTime[4] = (byte)(calendar.get(Calendar.HOUR_OF_DAY) &0xFF);
+        SettingActivity.tmpTime[5] = (byte)(calendar.get(Calendar.MINUTE) &0xFF);
+        SettingActivity.tmpTime[6] = (byte)(calendar.get(Calendar.SECOND) &0xFF);
+        bpProtocol.setDeviceTime(tmpTime);
+
     }
 
 

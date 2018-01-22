@@ -19,7 +19,10 @@ public class AboutUsActivity extends bpActivity {
         appversion = (FontButton)findViewById(R.id.build);
         mModel = (My3TextView) findViewById(R.id.deviceName);
         mModel.setBackground(Color.TRANSPARENT);
-        mModel.setValue(getString(R.string.app_name));
+
+        String deviceModel = getIntent().getStringExtra(APPConfig.deviceModelTag);
+
+        mModel.setValue(deviceModel);
         String version = "";
         try {
             version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;

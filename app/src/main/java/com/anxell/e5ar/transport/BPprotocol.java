@@ -128,6 +128,9 @@ public class BPprotocol {
     public static char nullData =0xFF;
     public static final long serialVersionUID = 4598738130123921552L;
 
+    public static final byte open_fail_PD = 0x01; //Permission denied
+    public static final byte open_fail_no_eroll= 0x02;
+
 
     private byte[] getCmdWrite(char cmdType, byte data[],int datalen) {
 

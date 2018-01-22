@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">E5AR</string>
+    <string name="app_name">E5AKR</string>
 
     <string name="bluetooth_access_control_system">Bluetooth Access Control System</string>
     <string name="anxell_technology_coproration">&#169; 2017 Anxell Technology Coproration</string>
@@ -196,5 +196,27 @@
     <string name="Confirm">承認</string>
     <string name="APP_version">APPのバージョン:</string>
     <string name="over_range_alarm">Over range</string>
+    <string name="settings_Admin_card">Admin Card/Tag</string>
+    <string name="settings_Admin_card_Edit">Edit Admin Card/Tag</string>
+    <string name="tamper_sensor_Level">Tamper Sensor Level</string>
+    <string name="_10_digits">10 digits</string>
+    <string name="enable_phone_access">Phone Access</string>
+    <string name="openType_Card">Card/Tag</string>
+    <string name="enable_card_access">Card Access</string>
+    <string name="users_manage_edit_status_Admin_card">Invalid Card!!</string>
+    <string name="users_manage_edit_status_duplication_card">Card/Tag Duplication!!</string>
+    <string name="Card">Card/Tag</string>
+    <string name="users_card_edit_dialog_title">Edit Card/Tag: (10 digits)</string>
+    <string name="Level_1">Level 1</string>
+    <string name="Level_2">Level 2</string>
+    <string name="Level_3">Level 3</string>
+    <string name="UserList_search_placeHolder">Please input User ID</string>
+    <string name="History_search_placeHolder">Please input User ID</string>
+    <string name="EnglishCharsAndNumber">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+
+    <string name="open_fail_permission_denied">アクセスが拒否されました。 あなたの管理者に連絡してください。</string>
+    <string name="open_fail_no_eroll">アクセスが拒否されました。 最初にログインしてアクセスしてください。</string>
+    <string name="eroll_fail">ログインに失敗しました。 ログイン情報を確認するか、管理者に連絡してください。</string>
+    <string name="eroll_success">あなたは正常にログインしました。 あなたは今ドアを開けることができます。</string>
 
 </resources>

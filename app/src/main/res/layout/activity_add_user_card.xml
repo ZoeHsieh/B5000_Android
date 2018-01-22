@@ -57,7 +57,9 @@
         android:inputType="numberDecimal"
         android:digits="1234567890"
         android:maxLength="10"
-        app:subject="@string/Card" >
+        app:subject="@string/Card"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
     </com.anxell.e5ar.custom.EditCardView>
 

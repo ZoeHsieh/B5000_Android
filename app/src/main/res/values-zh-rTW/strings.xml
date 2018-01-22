@@ -1,11 +1,11 @@
 <resources>
-    <string name="app_name">E5AR</string>
+    <string name="app_name">E5AKR</string>
 
     <string name="bluetooth_access_control_system">Bluetooth Access Control System</string>
     <string name="anxell_technology_coproration">&#169; 2017 Anxell Technology Coproration</string>
 
     <string name="hello">Hello!</string>
-    <string name="welcome">歡迎使用 E5AR</string>
+    <string name="welcome">歡迎使用 E5AKR</string>
     <string name="searching1">搜尋中請稍候</string>
     <string name="next">下一步</string>
     <string name="skip">略過</string>
@@ -217,4 +217,11 @@
     <string name="Level_3">等級3</string>
     <string name="UserList_search_placeHolder">請輸入User ID</string>
     <string name="History_search_placeHolder">請輸入User ID</string>
+    <string name="openType_Card">Card/Tag</string>
+    <string name="EnglishCharsAndNumber">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+
+    <string name="open_fail_permission_denied">Access Denied. Please Contact Your Administrator.</string>
+    <string name="open_fail_no_eroll">Access Denied. Please Login First to Get Access.</string>
+    <string name="eroll_fail">Login Failed. Please Verify Your Login Information Or Contact Your Administrator.</string>
+    <string name="eroll_success">You Have Successfully Logged In. You May Now Unlock A Door.</string>
 </resources>

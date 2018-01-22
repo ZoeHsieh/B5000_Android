@@ -17,6 +17,7 @@ import android.os.Process;
 import android.provider.Settings;
 //import android.support.v7.app.AppCompatActivity;
 import android.content.ServiceConnection;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import com.anxell.e5ar.BaseActivity;
@@ -394,7 +395,7 @@ public class bpActivity extends BaseActivity {
         if (text.equals(""))
             toastItem.cancel();
         else {
-            //toastItem.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+            toastItem.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
             toastItem.setText(text);
             toastItem.show();
             Handler handler = new Handler();
@@ -403,7 +404,7 @@ public class bpActivity extends BaseActivity {
                 public void run() {
                     toastItem.cancel();
                 }
-            }, 500);
+            }, 3000);
         }
     }
  private void cmdDataCache(byte rawData[]) {

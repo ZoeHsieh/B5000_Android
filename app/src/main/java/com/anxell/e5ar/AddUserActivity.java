@@ -50,7 +50,7 @@ public class AddUserActivity extends bpActivity implements View.OnClickListener 
         mIdET = (MyEditText) findViewById(R.id.id);
         mPasswordET = (MyEditText) findViewById(R.id.password);
         mIdET.setTextChangedListener(textWatcher);
-        mPasswordET.setRawInputType(this.getResources().getConfiguration().KEYBOARD_12KEY);
+        mPasswordET.setInputType(this.getResources().getConfiguration().KEYBOARD_12KEY);
         mPasswordET.setTextChangedListener(textWatcher);
         if(APPConfig.deviceType != APPConfig.deviceType_Keypad){
         mCardET = (EditCardView) findViewById(R.id.userCard);
@@ -73,6 +73,15 @@ public class AddUserActivity extends bpActivity implements View.OnClickListener 
             });
         }
 
+        mCardET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus)
+                {
+                    mCardET.findViewById(R.id.editText_Users_Edit_Dialog_Card1).requestFocus();
+                }
+            }
+        });
 
     }
     private void isUserDataLength(){
