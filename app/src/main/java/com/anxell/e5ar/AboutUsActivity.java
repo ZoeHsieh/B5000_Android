@@ -20,16 +20,16 @@ public class AboutUsActivity extends bpActivity {
         mModel = (My3TextView) findViewById(R.id.deviceName);
         mModel.setBackground(Color.TRANSPARENT);
 
-        String deviceModel = getIntent().getStringExtra(APPConfig.deviceModelTag);
-
-        mModel.setValue(deviceModel);
+//        String deviceModel = getIntent().getStringExtra(APPConfig.deviceModelTag);
+//
+//        mModel.setValue(deviceModel);
         String version = "";
         try {
             version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         }catch (Exception e){
 
         }
-        appversion.setText(getString(R.string.APP_version)+version);
+        appversion.setText(getString(R.string.APP_version)+" "+version);
     }
 
     @Override

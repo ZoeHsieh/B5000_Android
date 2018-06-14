@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">E5AKR</string>
+    <string name="app_name">ROFU B5000</string>
 
     <string name="bluetooth_access_control_system">Bluetooth Access Control System</string>
-    <string name="anxell_technology_coproration">&#169; 2017 Anxell Technology Coproration</string>
+    <string name="anxell_technology_coproration">© 2018 Copyright ROFU Security International Corp.</string>
 
     <string name="hello">Hello!</string>
     <string name="welcome">Welcome</string>
@@ -206,16 +206,22 @@
     <string name="users_card_edit_dialog_title">Edit Card/Fob: (10 digits)</string>
     <string name="Confirm">Confirm</string>
     <string name="APP_version">APP version:</string>
-    <string name="over_range_alarm">Over range</string>
-    <string name="Level_1">Level 1</string>
-    <string name="Level_2">Level 2</string>
-    <string name="Level_3">Level 3</string>
-    <string name="UserList_search_placeHolder">Please input User ID</string>
-    <string name="History_search_placeHolder">Please input User ID</string>
+    <string name="over_range_alarm">Out of range!! Please enter a number within 0-255.</string>
+    <string name="Level_1">Level 1 (High Sensitivity)</string>
+    <string name="Level_2">Level 2 (Mid Sensitivity)</string>
+    <string name="Level_3">Level 3 (Low Sensitivity)</string>
+    <string name="UserList_search_placeHolder">Enter an user ID to search user.</string>
+    <string name="History_search_placeHolder">Enter an user ID to search user.</string>
     <string name="EnglishCharsAndNumber">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
 
     <string name="open_fail_permission_denied">Access Denied. Please Contact Your Administrator.</string>
     <string name="open_fail_no_eroll">Access Denied. Please Login First to Get Access.</string>
     <string name="eroll_fail">Login Failed. Please Verify Your Login Information Or Contact Your Administrator.</string>
     <string name="eroll_success">You Have Successfully Logged In. You May Now Unlock A Door.</string>
+
+
+    <string name="permission_title">Functionality limited</string>
+    <string name="permission_message_location">Since location access has not been granted, this app will not be able to discover beacons.</string>
+    <string name="permission_message_storage">Since storage access has not been granted, this app will not be able to backup settings.</string>
+    <string name="need_gps">Android OS 6.0 and up require to enable Location service to find nearby Bluetooth devices. Make sure to enable Location service on your phone.</string>
 </resources>

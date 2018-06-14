@@ -1,5 +1,6 @@
 package com.anxell.e5ar;
 
+import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -13,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,12 +22,18 @@ import android.os.ParcelUuid;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.anxell.e5ar.custom.FontTextView;
 import com.anxell.e5ar.custom.MyButton;
@@ -39,6 +47,9 @@ import com.anxell.e5ar.transport.ScanItemData;
 import com.anxell.e5ar.transport.bpActivity;
 import com.anxell.e5ar.util.Util;
 
+import org.w3c.dom.Text;
+
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -48,7 +59,7 @@ import java.util.List;
 
 public class HomeActivity extends bpActivity implements View.OnClickListener {
     private String TAG = HomeActivity.class.getSimpleName().toString();
-    private Boolean debugFlag = false;
+    private Boolean debugFlag = true;
     private PercentRelativeLayout mFoundV;
     private MyDeviceView mDeviceV;
     private FontTextView mDoorStatusTV;
@@ -89,20 +100,33 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     private boolean isCheckConnection = false;
     private Thread CheckConnection = null;
     private ArrayAdapter<String> mDevListAdapter;
+
+    private Handler handler;
+    private FontTextView mModelTV;
+    private ImageView infoOperatingIV;
+    private TextView mAutoRangeSettingValueV;
+
+
+    private static final int REQUEST_ENABLE_LOCATION = 2;
+    private boolean isShowing_BT_dialog = false;
+    private boolean isShowing_GPS_dialog = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Initial(getLocalClassName());
         setContentView(R.layout.activity_home);
 
+        handler = new Handler();
         findViews();
         setListeners();
 
         mCurrentView = mFoundV;
 
-        showModel("ABC123");
+//        showModel("ABC123");
         // start demo
-       // mDeviceV.setDeviceName("E3AK001");
+        // mDeviceV.setDeviceName("E3AK001");
         Intent intent = getIntent();
         intent.setClass(this,RBLService.class);
         bindService(intent, ServiceConnection, BIND_AUTO_CREATE);
@@ -116,37 +140,38 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         String PhoneModel = android.os.Build.MODEL;
         Util.debugMessage(TAG,"PhoneModel ="+PhoneModel,debugFlag);
 
-   }
+
+    }
 
     @Override
     protected void onRestart() {
         super.onRestart();
         Util.debugMessage(TAG,"onRestart",debugFlag);
         if(!isConService){
-        currentClassName = getLocalClassName();
-        Intent intent = getIntent();
-        intent.setClass(this,RBLService.class);
-        bindService(intent, ServiceConnection, BIND_AUTO_CREATE);
-         IntentFilter filter = getIntentFilter();
+            currentClassName = getLocalClassName();
+            Intent intent = getIntent();
+            intent.setClass(this,RBLService.class);
+            bindService(intent, ServiceConnection, BIND_AUTO_CREATE);
+            IntentFilter filter = getIntentFilter();
             filter.addAction("android.bluetooth.device.action.PAIRING_REQUEST");
-        registerReceiver(mGattUpdateReceiver, filter);
+            registerReceiver(mGattUpdateReceiver, filter);
             //deviceInfoList.scanItems.clear();
             isCheckConnection = true;
-             if(isEditDeviceName) {
+            if(isEditDeviceName) {
                 BLE_Scanner_Start(false);
 
 
-                 Handler scanTimer = new Handler();
-                 scanTimer.postDelayed(new Runnable() {
-                     @Override
-                     public void run() {
+                Handler scanTimer = new Handler();
+                scanTimer.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
                         BLE_Scanner_Start(true);
-                         isEditDeviceName = false;
+                        isEditDeviceName = false;
 
-                        }
-                     },2000);
+                    }
+                },2000);
 
-             }
+            }
 
 
         }
@@ -156,6 +181,15 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     protected void onStop() {
         super.onStop();
         Util.debugMessage(TAG,"onStop",debugFlag);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+
+        int id= android.os.Process.myPid();
+        android.os.Process.killProcess(id);
     }
 
     private void initBLE(){
@@ -171,7 +205,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                 Util.debugMessage(TAG,"Not support ScanBatching!!",debugFlag);
             }
             //if(!mBluetoothAdapter.isEnabled())
-               // mBluetoothAdapter.enable();
+            // mBluetoothAdapter.enable();
             //Get System BLE MAC Address
             update_system_ble_mac_addrss();
 
@@ -191,11 +225,11 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
                         if(getConnectedDevices().size()>0){
 
-                        if(!isOpenDoor && !isEnroll &&!isKeepOpen){
-                            Util.debugMessage(TAG,"disconnect not success",debugFlag);
+                            if(!isOpenDoor && !isEnroll &&!isKeepOpen){
+                                Util.debugMessage(TAG,"disconnect not success",debugFlag);
 
                                 disconnect();
-                            runOnUiThread(checkEventTask);
+                                runOnUiThread(checkEventTask);
                             }
                         }
                         try {
@@ -233,11 +267,11 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     @Override
     public void noSuchElement(){
         if(isAutoMode){
-        bpProtocol.reInitQueue();
-        StopBgAutoTimer();
+            bpProtocol.reInitQueue();
+            StopBgAutoTimer();
 
             try{
-            Thread.sleep(1000);
+                Thread.sleep(1000);
 
             }catch (java.lang.InterruptedException e){
             }
@@ -257,10 +291,11 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
         if(isAutoMode){
             Util.debugMessage(TAG,"auto on",debugFlag);
-            StopScanningTimer();
+//            StopScanningTimer();
             CreateBgAutoTimer();
             StartBgAutoTimer();
-            mAutoOpenTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.checkbox_tick, 0, 0, 0);
+//            mAutoOpenTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.checkbox_tick, 0, 0, 0);
+            mAutoOpenTV.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.checkbox_tick, 0, 0, 0);
 
         }
 
@@ -269,8 +304,8 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         //if(PhoneModel2.equals("OPPO")){
 
 
-            isCheckConnection = true;
-            checkEventClose();
+        isCheckConnection = true;
+        checkEventClose();
         //}
         Util.debugMessage(TAG,"MANUFACTURER="+PhoneModel2,debugFlag);
 
@@ -283,42 +318,43 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
         //isActive = true;
 
-        if ((mBluetoothAdapter == null) || (!mBluetoothAdapter.isEnabled())) {
-            Intent enableBtIntent = new Intent(
-                    BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-            mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
+//        if ((mBluetoothAdapter == null) || (!mBluetoothAdapter.isEnabled())) {
+//            Intent enableBtIntent = new Intent(
+//                    BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+//        } else {
+//            mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
+//
+//            //mLEScanner = mBluetoothAdapter;
+//            mLEScanSettings = new ScanSettings.Builder()
+//                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+//                    .build();
+//
+//            mLEScanFilters = new ArrayList<>();
+//            ScanFilter filter = new ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(RBLService.UUID_BLE_E3K_SERVICE.toString())).build();
+//            mLEScanFilters.add(filter);
+//            // BLE_Scanner_Start(true);
+//            if(!isAutoMode)
+//                StartScanningTimer();
+//        }
+        check_BT_HomeActivity(true);
+        // ClearNotification();
 
-            //mLEScanner = mBluetoothAdapter;
-            mLEScanSettings = new ScanSettings.Builder()
-                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                    .build();
-
-            mLEScanFilters = new ArrayList<>();
-            ScanFilter filter = new ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(RBLService.UUID_BLE_E3K_SERVICE.toString())).build();
-            mLEScanFilters.add(filter);
-           // BLE_Scanner_Start(true);
-            if(!isAutoMode)
-                StartScanningTimer();
-        }
-
-       // ClearNotification();
-
-       // mIsBackGround_Mode = false;
-       // registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        // mIsBackGround_Mode = false;
+        // registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
 
     private void BLE_Scanner_Start(boolean option) {
 
 
-
         if (option) {
 
-                Util.debugMessage(TAG,"le scan start",debugFlag);
-                mLEScanner.startScan(null, mLEScanSettings, mScanCallback);
+
+
+            Util.debugMessage(TAG,"le scan start",debugFlag);
+            mLEScanner.startScan(null, mLEScanSettings, mScanCallback);
             isScanning = true;
-              //mLEScanner.startScan(mScanCallback);
+            //mLEScanner.startScan(mScanCallback);
 
 
         } else {
@@ -352,10 +388,14 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     private final ScanCallback mScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
+            if (result.getScanRecord().getManufacturerSpecificData(93) == null)
+            {
+                return;
+            }
+
             //super.onScanResult(callbackType, result);
             int duplicate_idx = -1;
-
-            //Util.debugMessage(TAG,"onScanResult: NEW Address = [" + result.getDevice().getAddress() + "], RSSI = " + result.getRssi() + ".",debugFlag);
+//            Util.debugMessage(TAG,"onScanResult: NEW Address = [" + result.getDevice().getAddress() + "], RSSI = " + result.getRssi() + ".",debugFlag);
 
             // Util.debugMessage(TAG, "onScanResult: Check RSSI. Taget = " + AutoMode_DetectRSSI + ", Device = " + result.getRssi() + ".",debugFlag);
             //Util.debugMessage(TAG,"deviceName="+result.getDevice().getName(),debugFlag);
@@ -365,103 +405,144 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
             // Util.debugMessage(TAG,"test deviceName="+test.getName()+"bd Addr="+test.getAddress(),debugFlag);
 
             byte rawData[] = result.getScanRecord().getBytes();
+//            byte mandufacturerData[] = result.getScanRecord().getManufacturerSpecificData(0x0000);
+            SparseArray<byte[]> mandufacturerData = result.getScanRecord().getManufacturerSpecificData();
+
             if (debugFlag) {
                 int count = 0;
                 for (byte tmp : rawData){
                     Util.debugMessage(TAG, String.format("Data[%d]=%02x", count, tmp), true);
-                count++;
+                    count++;
                 }
             }
-            //device advertising Raw Data
-            String customID = Util.bytesToHex(Arrays.copyOfRange(rawData,33,35));
+
+
+
+//            String customID = Integer.toHexString(mandufacturerData.keyAt(0) & 0x00FF | 0xFF00);
+            String companyID = Integer.toHexString(mandufacturerData.keyAt(0) & 0xFFFF | 0x0000);
+            companyID = Util.padRight(companyID,4,'0');
+
+
+
+
+//            String customID = Util.bytesToHex(Arrays.copyOfRange(customID_byte ,0,2));
+            Util.debugMessage(TAG,"companyID="+companyID,debugFlag);
+
+
+            String customID = Util.bytesToHex(Arrays.copyOfRange(mandufacturerData.valueAt(0),3,5));
             Util.debugMessage(TAG,"customID="+customID,debugFlag);
-            String deviceModel = Util.bytesToHex(Arrays.copyOfRange(rawData,35,37));
-            Util.debugMessage(TAG,"deviceModel="+deviceModel,debugFlag);
-            String deviceCategory = Util.bytesToHex(Arrays.copyOfRange(rawData,37,38));
-            Util.debugMessage(TAG,"deviceCategory="+deviceCategory,debugFlag);
-            String deviceColor = Util.bytesToHex(Arrays.copyOfRange(rawData,39,41));
-            Util.debugMessage(TAG,"deviceColor="+deviceColor,debugFlag);
-            String deviceReserved = Util.bytesToHex(Arrays.copyOfRange(rawData,41,42));
-            Util.debugMessage(TAG,"deviceReserved="+deviceReserved,debugFlag);
 
             String customIDStr = (String)APPConfig.advertisingData.CUSTOM_IDs.get(customID.toUpperCase());
+            Util.debugMessage(TAG,"customIDStr="+customIDStr,debugFlag);
             if(customIDStr==null)
                 return;
-            Util.debugMessage(TAG,"customIDStr="+customIDStr,debugFlag);
-            String deviceModelStr = (String)APPConfig.advertisingData.dev_Model.get(deviceModel.toUpperCase());
-            if(deviceModelStr==null)
+
+
+            if  (customIDStr != APPConfig.CustomID.toUpperCase())
+            {
                 return;
+            }
+
+
+            String deviceModel = Util.bytesToHex(Arrays.copyOfRange(mandufacturerData.valueAt(0),0,2));
+            Util.debugMessage(TAG,"deviceModel="+deviceModel,debugFlag);
+            String deviceCategory = Util.bytesToHex(Arrays.copyOfRange(mandufacturerData.valueAt(0),2,3));
+            Util.debugMessage(TAG,"deviceCategory="+deviceCategory,debugFlag);
+
+            String deviceReserved = Util.bytesToHex(Arrays.copyOfRange(mandufacturerData.valueAt(0),5,6));
+            Util.debugMessage(TAG,"deviceReserved="+deviceReserved,debugFlag);
+
+
+            String deviceModelStr = (String)APPConfig.advertisingData.dev_Model.get(deviceModel.toUpperCase());
+            if(deviceModelStr==null) {
+                return;
+            }
             Util.debugMessage(TAG,"deviceModelStr="+deviceModelStr,debugFlag);
             String deviceCategoryStr = (String)APPConfig.advertisingData.dev_Category.get(deviceCategory.toUpperCase());
             if(deviceCategory==null)
+            {
                 return;
+            }
+
             Util.debugMessage(TAG,"deviceCategoryStr="+deviceCategoryStr,debugFlag);
-            String deviceColorStr = (String)APPConfig.advertisingData.dev_Color.get(deviceColor.toUpperCase());
-            if (deviceColor==null)
-                return;
-            Util.debugMessage(TAG,"deviceColorStr="+deviceColorStr,debugFlag);
+//            String deviceColorStr = (String)APPConfig.advertisingData.dev_Color.get(deviceColor.toUpperCase());
+//            if (deviceColor==null)
+//                return;
+//            Util.debugMessage(TAG,"deviceColorStr="+deviceColorStr,debugFlag);
             String deviceReservedStr = (String)APPConfig.advertisingData.dev_Reserved.get(deviceReserved.toUpperCase());
-            if(deviceReservedStr==null)
+            if(deviceReservedStr==null) {
                 return;
+            }
             Util.debugMessage(TAG,"deviceReservedStr="+deviceReservedStr,debugFlag);
 
-            if(!APPConfig.CustomID.equals(customIDStr))
+            if(!APPConfig.CustomID.equals(customIDStr)) {
                 return;
-            if(!deviceModelStr.contains(APPConfig.deviceSeries))
+            }
+//            if(!deviceModelStr.contains(APPConfig.deviceSeries))
+//            {
+//                return;
+//            }
+            if(!APPConfig.deviceSeries.contains(deviceModelStr))   //easiprox特殊比對
+            {
                 return;
+            }
+
             if(result.getDevice().getAddress().toString().substring(0,8).equals(BPprotocol.bp_address)) {
-                ScanItem tmpScanItem_FullRange = new ScanItem(result.getDevice().getName(), result.getDevice().getAddress(),customIDStr,deviceModelStr,deviceCategoryStr,deviceColorStr,deviceReserved, result.getRssi(), 5);
+                ScanItem tmpScanItem_FullRange = new ScanItem(result.getDevice().getName(), result.getDevice().getAddress(),customIDStr,deviceModelStr,deviceCategoryStr,deviceReserved, result.getRssi(), 18);
                 //Util.debugMessage(TAG, "deviceName=" + result.getDevice().getName(), debugFlag);
 
 
 
-                    int i = 0;
+                int i = 0;
 
 
-                    //Check Duplicate
-                    duplicate_idx = deviceInfoList.check_device_exist_by_addr(result.getDevice().getAddress());
+                //Check Duplicate
+                duplicate_idx = deviceInfoList.check_device_exist_by_addr(result.getDevice().getAddress());
 
-                    if (duplicate_idx >= 0) {
-                        //Duplicate
-                        //Check RSSI
+                if (duplicate_idx >= 0) {
+                    //Duplicate
+                    //Check RSSI
 
-                        if (tmpScanItem_FullRange.rssi >= APPConfig.E3K_DEVICES_BLE_RSSI_MIN) {
-                            //AVG RSSI
-                            tmpScanItem_FullRange.rssi = (tmpScanItem_FullRange.rssi + deviceInfoList.scanItems.get(duplicate_idx).rssi) / 2;
-                            //Replace Item
-                            deviceInfoList.scanItems.set(duplicate_idx, tmpScanItem_FullRange);
+                    if (tmpScanItem_FullRange.rssi >= APPConfig.E3K_DEVICES_BLE_RSSI_MIN) {
+                        //AVG RSSI
+                        tmpScanItem_FullRange.rssi = (tmpScanItem_FullRange.rssi + deviceInfoList.scanItems.get(duplicate_idx).rssi) / 2;
+                        //Replace Item
+                        deviceInfoList.scanItems.set(duplicate_idx, tmpScanItem_FullRange);
 
-                            //Log.v(TAG, "Replace: = [" + tmpScanItem.dev_addr + "], RSSI = " + tmpScanItem.rssi + ".");
-                        } /*else {
+                        //Log.v(TAG, "Replace: = [" + tmpScanItem.dev_addr + "], RSSI = " + tmpScanItem.rssi + ".");
+                    } /*else {
 
                             deviceInfoList.scanItems.remove(duplicate_idx);
                         }*/
-                    } else {
-                        //New
-                        //Check RSSI
-                        if (tmpScanItem_FullRange.rssi >= APPConfig.E3K_DEVICES_BLE_RSSI_MIN) {
-                            deviceInfoList.scanItems.add(tmpScanItem_FullRange);
-                            //mDeviceV.setDeviceName(tmpScanItem_FullRange.dev_name);
-                            if(!checkDeviceLevelExist(tmpScanItem_FullRange.dev_addr))
-                                saveDeviceRSSILevel(tmpScanItem_FullRange.dev_addr,APPConfig.E3K_DEVICES_BLE_RSSI_LEVEL_DEFAULT);
-                        }
+                } else {
+                    //New
+                    //Check RSSI
+                    if (tmpScanItem_FullRange.rssi >= APPConfig.E3K_DEVICES_BLE_RSSI_MIN) {
+                        deviceInfoList.scanItems.add(tmpScanItem_FullRange);
+                        //mDeviceV.setDeviceName(tmpScanItem_FullRange.dev_name);
+                        if(!checkDeviceLevelExist(tmpScanItem_FullRange.dev_addr))
+                            saveDeviceRSSILevel(tmpScanItem_FullRange.dev_addr,APPConfig.E3K_DEVICES_BLE_RSSI_LEVEL_DEFAULT);
                     }
-
-
-                    Collections.sort(deviceInfoList.scanItems, new Comparator<ScanItem>() {
-                        @Override
-                        public int compare(ScanItem lhs, ScanItem rhs) {
-                            return rhs.rssi - lhs.rssi;
-                        }
-                    });
-
                 }
 
-                if(deviceInfoList.size() > 0 && !isOpenDoor &&!isEnroll) {
 
-               // Util.debugMessage(TAG,"update home UI",debugFlag);
+                Collections.sort(deviceInfoList.scanItems, new Comparator<ScanItem>() {
+                    @Override
+                    public int compare(ScanItem lhs, ScanItem rhs) {
+                        return rhs.rssi - lhs.rssi;
+                    }
+                });
+
+            }
+
+            if(deviceInfoList.size() > 0 && !isOpenDoor &&!isEnroll) {
+
+                // Util.debugMessage(TAG,"update home UI",debugFlag);
                 if(!isForce)
+                {
                     mDeviceV.setDeviceName(deviceInfoList.scanItems.get(0).dev_name);
+                    mModelTV.setText(getResources().getText(R.string.device_distance) + " : " + APPConfig.Convert_RSSI_to_LEVEL(deviceInfoList.scanItems.get(0).rssi));
+                }
                 else{
 
                     if(forceDevice.getAddress().equals(result.getDevice().getAddress().toString())){
@@ -471,14 +552,20 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                         }
 
                     }
+                    mModelTV.setText(getResources().getText(R.string.device_distance) + " : " + APPConfig.Convert_RSSI_to_LEVEL(deviceInfoList.scanItems.get(0).rssi));
                 }
                 updateView(mFoundV);
                 mDeviceV.setStatusDotEnable(true);
+                int expectLEVEL = loadDeviceRSSILevel(getTargetDevice().getAddress());
+                int currrentLEVEL = APPConfig.Convert_RSSI_to_LEVEL(getCurrLevel(getTargetDevice().getAddress()));
+                mModelTV.setText(getResources().getText(R.string.device_distance) + " : " + currrentLEVEL);
+                mAutoRangeSettingValueV.setText(getResources().getText(R.string.proximity_read_range_setting)+" : "+expectLEVEL);
+
 
             }
 
 
-            }
+        }
 
 
 
@@ -520,7 +607,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
 
         if(!isEnroll)
-        bpProtocol.queueClear();
+            bpProtocol.queueClear();
         Util.debugMessage(TAG,"the device is connected ",debugFlag);
 
 
@@ -556,8 +643,8 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
             case BPprotocol.cmd_user_indentify:
 
 
-                    Util.debugMessage(TAG,"create disconnect timer",debugFlag);
-                    disConTimer.postDelayed(DisConTask,APPConfig.disTimeOut);
+                Util.debugMessage(TAG,"create disconnect timer",debugFlag);
+                disConTimer.postDelayed(DisConTask,APPConfig.disTimeOut);
                  /*   disConTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
@@ -623,112 +710,114 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     @Override
     public void cmdAnalysis(byte cmd, byte cmdType, byte data[], int datalen){
 
-                switch ((char) cmd) {
+        switch ((char) cmd) {
 
-                    case BPprotocol.cmd_user_enroll:
+            case BPprotocol.cmd_user_enroll:
 
-                        if (datalen > 1) {
-                            int UserIndex = 0;
-                            UserIndex = encode.getUnsignedTwoByte(data);
+                if (datalen > 1) {
+                    int UserIndex = 0;
+                    UserIndex = encode.getUnsignedTwoByte(data);
 
-                            Util.debugMessage(TAG,"User enroll index=" + UserIndex,debugFlag);
+                    Util.debugMessage(TAG,"User enroll index=" + UserIndex,debugFlag);
 
-                            sharedPreferences.edit().putInt(BPprotocol.indexTag+getBluetoothDeviceAddress(), UserIndex).commit();
-                            Util.debugMessage(TAG,"Enroll OK",debugFlag);
+                    sharedPreferences.edit().putInt(BPprotocol.indexTag+getBluetoothDeviceAddress(), UserIndex).commit();
+                    Util.debugMessage(TAG,"Enroll OK",debugFlag);
 
-                            sharedPreferences.edit().putBoolean(getBluetoothDeviceAddress(), false).commit();
+                    sharedPreferences.edit().putBoolean(getBluetoothDeviceAddress(), false).commit();
 
-                            show_toast_msg(getString(R.string.eroll_success));
+                    show_toast_msg(getString(R.string.eroll_success));
 
-                        } else {
-                            show_toast_msg(getString(R.string.eroll_fail));
-                            Util.debugMessage(TAG, "Enroll fail",debugFlag);
-                        }
-
-
-                        break;
-
-                    case BPprotocol.cmd_device_config:
-                        if (cmdType == (byte) BPprotocol.type_read) {
-
-                            boolean door_sensor_opt = (data[0] != 0);
-                            byte lock_type = data[1];
-                            int delay_secs = ((data[2] << 8) & 0x0000ff00) | (data[3] & 0x000000ff);
-                            boolean ir_sensor_opt = (data[4] != 0);
-
-                            if (lock_type == BPprotocol.door_statis_KeepOpen) {
-                                Util.debugMessage(TAG, "delay Time", debugFlag);
-                                lock_type = BPprotocol.door_statis_delayTime;
-
-                            } else {
-                                Util.debugMessage(TAG, "KeepOpen", debugFlag);
-                                lock_type = BPprotocol.door_statis_KeepOpen;
-
-                            }
-                            Util.debugMessage(TAG, "send new config", debugFlag);
-
-                            bpProtocol.setDeviceConfig(door_sensor_opt, lock_type, delay_secs, ir_sensor_opt);
-
-                        }else if (cmdType == (byte) BPprotocol.type_write)
-                            ForceDisconnect();
-
-
-
-
-                        break;
-
-
-
-                    case BPprotocol.cmd_fw_version:
-
-
-                            Util.debugMessage(TAG,"exeForce disconnect",debugFlag);
-                            bpProtocol.executeForceDisconnect();
-
-                        break;
-                    case BPprotocol.cmd_admin_enroll:
-
-                        if (data[0] == BPprotocol.result_success) {
-                            show_toast_msg(getString(R.string.eroll_success));
-                            sharedPreferences.edit().putBoolean(getBluetoothDeviceAddress(), true).apply();
-                        }
-                        else {
-                            show_toast_msg(getString(R.string.eroll_fail));
-                            Util.debugMessage(TAG, "ADMIN ENROLL FAIL", debugFlag);
-                        }
-                        break;
-
-                    case BPprotocol.cmd_admin_indentify:
-                    case BPprotocol.cmd_user_indentify:
-                        if(!isAutoMode){
-                            switch(data[0]){
-
-                                case BPprotocol.open_fail_no_eroll:
-                                    show_toast_msg(getString(R.string.open_fail_no_eroll));
-                                    break;
-
-                                case BPprotocol.open_fail_PD:
-                                    show_toast_msg(getString(R.string.open_fail_permission_denied));
-                                    break;
-
-                            }
-                        }
-
-                        break;
-
-
-                    default:
-                        Util.debugMessage(TAG,"cmd="+String.format("%02x",cmd),debugFlag);
-
+                } else {
+                    show_toast_msg(getString(R.string.eroll_fail));
+                    Util.debugMessage(TAG, "Enroll fail",debugFlag);
                 }
 
 
+                break;
+
+            case BPprotocol.cmd_device_config:
+                if (cmdType == (byte) BPprotocol.type_read) {
+
+                    boolean door_sensor_opt = (data[0] != 0);
+                    byte lock_type = data[1];
+                    int delay_secs = ((data[2] << 8) & 0x0000ff00) | (data[3] & 0x000000ff);
+                    boolean ir_sensor_opt = (data[4] != 0);
+
+                    if (lock_type == BPprotocol.door_statis_KeepOpen) {
+                        Util.debugMessage(TAG, "delay Time", debugFlag);
+                        lock_type = BPprotocol.door_statis_delayTime;
+
+                    } else {
+                        Util.debugMessage(TAG, "KeepOpen", debugFlag);
+                        lock_type = BPprotocol.door_statis_KeepOpen;
+
+                    }
+                    Util.debugMessage(TAG, "send new config", debugFlag);
+
+                    bpProtocol.setDeviceConfig(door_sensor_opt, lock_type, delay_secs, ir_sensor_opt);
+
+                }else if (cmdType == (byte) BPprotocol.type_write)
+                    ForceDisconnect();
+
+
+
+
+                break;
+
+
+
+            case BPprotocol.cmd_fw_version:
+
+
+                Util.debugMessage(TAG,"exeForce disconnect",debugFlag);
+                bpProtocol.executeForceDisconnect();
+
+                break;
+            case BPprotocol.cmd_admin_enroll:
+
+                if (data[0] == BPprotocol.result_success) {
+                    show_toast_msg(getString(R.string.eroll_success));
+                    sharedPreferences.edit().putBoolean(getBluetoothDeviceAddress(), true).apply();
+                }
+                else {
+                    show_toast_msg(getString(R.string.eroll_fail));
+                    Util.debugMessage(TAG, "ADMIN ENROLL FAIL", debugFlag);
+                }
+                break;
+
+            case BPprotocol.cmd_admin_indentify:
+            case BPprotocol.cmd_user_indentify:
+                if(!isAutoMode){
+                    switch(data[0]){
+
+                        case BPprotocol.open_fail_no_eroll:
+                            show_toast_msg(getString(R.string.open_fail_no_eroll));
+                            break;
+
+                        case BPprotocol.open_fail_PD:
+                            show_toast_msg(getString(R.string.open_fail_permission_denied));
+                            break;
+
+                    }
+                }
+
+
+
+                break;
+
+
+            default:
+                Util.debugMessage(TAG,"cmd="+String.format("%02x",cmd),debugFlag);
+
+        }
+
+        stop_anime();
     }
 
 
     @Override
     public void disconnectUpdate() {
-           Calendar time = Calendar.getInstance();
+        Calendar time = Calendar.getInstance();
         int min = time.get(Calendar.MINUTE);
         int sec =  time.get(Calendar.SECOND);
         int disconTime = min *60 + sec;
@@ -746,10 +835,11 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
             StartScanningTimer();
         mDoorIB.setImageResource(R.drawable.door_close);
         mDoorStatusTV.setText(R.string.door_closed);
-        mDoorStatusTV.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        mDoorStatusTV.setTextColor(getResources().getColor(android.R.color.black));
         mOpenBtn.setVisibility(View.VISIBLE);
         mOpenedIB.setVisibility(View.GONE);
 
+        stop_anime();
     }
 
     private void findViews() {
@@ -764,6 +854,8 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         mRefreshIB = (ImageButton) findViewById(R.id.refresh);
         mProgressBarV = (PercentRelativeLayout) findViewById(R.id.progressBar);
         mAutoOpenTV = (FontTextView) findViewById(R.id.autoOpen);
+        mModelTV = (FontTextView) findViewById(R.id.model);
+        mAutoRangeSettingValueV = (TextView) findViewById(R.id.auto_range_setting);
     }
 
     private void setListeners() {
@@ -772,34 +864,34 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         mDeviceV.setOnClickListener(this);
         mDoorIB.setOnClickListener(this);
         mOpenBtn.setOnClickListener(this);
-        mOpenBtn.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                String deviceAddr;
-
-                if(deviceInfoList.size() > 0){
-                    deviceAddr= getTargetDevice().getAddress();
-
-                if(!deviceAddr.equals("")&&!isAutoMode){
-                    boolean isAdmin = sharedPreferences.getBoolean(deviceAddr,false);
-
-                    if(isAdmin) {
-
-                        isKeepOpen = true;
-                        BLE_Scanner_Start(true);
-                        if(connect(deviceAddr))
-                            Util.debugMessage(TAG,"open btn connect ok",debugFlag);
-                        else
-                            Util.debugMessage(TAG,"connect fail",debugFlag);
-                        StartConnectTimer();
-                    }
-                }
-                }
-
-                return true;
-            }
-
-        });
+//        mOpenBtn.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                String deviceAddr;
+//
+//                if(deviceInfoList.size() > 0){
+//                    deviceAddr= getTargetDevice().getAddress();
+//
+//                    if(!deviceAddr.equals("")&&!isAutoMode){
+//                        boolean isAdmin = sharedPreferences.getBoolean(deviceAddr,false);
+//
+//                        if(isAdmin) {
+//
+//                            isKeepOpen = true;
+//                            BLE_Scanner_Start(true);
+//                            if(connect(deviceAddr))
+//                                Util.debugMessage(TAG,"open btn connect ok",debugFlag);
+//                            else
+//                                Util.debugMessage(TAG,"connect fail",debugFlag);
+//                            StartConnectTimer();
+//                        }
+//                    }
+//                }
+//
+//                return true;
+//            }
+//
+//        });
         mRefreshIB.setOnClickListener(this);
         mAutoOpenTV.setOnClickListener(this);
 
@@ -821,17 +913,20 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+        findViewById(R.id.relogin).setEnabled(false);
+        findViewById(R.id.setup).setEnabled(false);
+
         switch (view.getId()) {
             case R.id.deviceView:
                 if(deviceInfoList.size()>0)
-                showDevices();
+                    showDevices();
                 break;
 
             case R.id.relogin:
                 //openPasswordPage();
                 if (!isAutoMode){
                     BLE_Scanner_Start(false);
-                    StopScanningTimer();
+//                    StopScanningTimer();
                     if (deviceInfoList.size() >0 && !isEnroll && !isOpenDoor) {
                         AdminMenu adminMenu = new AdminMenu(this, mFoundV, bpProtocol);
                         String bdAddr = "";
@@ -850,7 +945,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
             case R.id.setup:
                 if (!isAutoMode){
-                    StopScanningTimer();
+//                    StopScanningTimer();
                     if (deviceInfoList.size() >0 && !isEnroll && !isOpenDoor) {
                         BLE_Scanner_Start(false);
                         isCheckConnection = false;
@@ -893,49 +988,62 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                 break;
             // end demo
         }
+
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.relogin).setEnabled(true);
+                findViewById(R.id.setup).setEnabled(true);
+            }
+        },500);
+
     }
 
     private void openDoor() {
         if(!isAutoMode) {
-           if(!isOpenDoor && !isEnroll){
+            if(!isOpenDoor && !isEnroll){
 
 
 
-            if(deviceInfoList.size() > 0) {
-                BLE_Scanner_Start(false);
-                String targetAddr = getTargetDevice().getAddress();
+                if(deviceInfoList.size() > 0) {
+                    BLE_Scanner_Start(false);
+                    String targetAddr = getTargetDevice().getAddress();
 
 
-                if (!targetAddr.equals("")) {
-                    mDoorStatusTV.setText(R.string.door_opened);
-                    mDoorStatusTV.setTextColor(this.getResources().getColor(R.color.green));
-                    mDoorIB.setImageResource(R.drawable.door_open);
-                    mOpenBtn.setVisibility(View.GONE);
-                    mOpenedIB.setVisibility(View.VISIBLE);
-                    StopScanningTimer();
-                    BLE_Scanner_Start(true);
-                     if(connect(targetAddr))
-                        Util.debugMessage(TAG,"connect ok",debugFlag);
-                     else
-                         Util.debugMessage(TAG,"connect fail",debugFlag);
-                    StartConnectTimer();
+                    if (!targetAddr.equals("")) {
+                        mDoorStatusTV.setText(R.string.door_opened);
+                        mDoorStatusTV.setTextColor(this.getResources().getColor(R.color.green));
+                        mDoorIB.setImageResource(R.drawable.door_open);
+                        mDoorIB.setEnabled(false);
+                        mOpenBtn.setVisibility(View.GONE);
+                        mOpenedIB.setVisibility(View.VISIBLE);
+//                    StopScanningTimer();
+                        BLE_Scanner_Start(true);
+                        start_anime();
+                        if(connect(targetAddr))
+                            Util.debugMessage(TAG,"connect ok",debugFlag);
+                        else
+                            Util.debugMessage(TAG,"connect fail",debugFlag);
+                        StartConnectTimer();
 
-                    isOpenDoor = true;
-                } else
-                    isOpenDoor = false;
+                        isOpenDoor = true;
+                    } else
+                        isOpenDoor = false;
 
 
 
+                }
+            }else{
+                StartScanningTimer();
             }
-           }else{
-                   StartScanningTimer();
-           }
         }else{
             show_toast_msg(getString(R.string.AUTO_ENABLE_CONFLICT));
         }
     }
 
     private void StartScanningTimer(){
+        StopScanningTimer();
         /*BLE_Scanner_Start(false);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -945,26 +1053,70 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
             }
         },500);*/
         if(!isEditDeviceName){
-        BLE_Scanner_Start(true);
-           // Util.debugMessage(TAG,"timer rescan",true);
+            BLE_Scanner_Start(true);
+            // Util.debugMessage(TAG,"timer rescan",true);
         }
         ScanningTimerFlag = true;
         scaningTimer = new Thread(new Runnable() {
             @Override
             public void run() {
                 while(ScanningTimerFlag){
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            check_BT_HomeActivity(false);
+                            check_GPS_HomeActivity();
+                        }
+                    });
                     //Util.debugMessage(TAG,"ScanTimer",debugFlag);
+
+//                    BLE_Scanner_Start(false);
+//                    try{
+//                        Thread.sleep(200);
+//
+//                    }catch(java.lang.InterruptedException e){
+//
+//                    }
+
+//                    Calendar dt = Calendar.getInstance();
+//
+//                    final int thisYear = dt.get(Calendar.YEAR);
+//
+//                    final int thisMonth = dt.get(Calendar.MONTH)+1;
+//
+//                    final int thisDate = dt.get(Calendar.DAY_OF_MONTH);
+//
+//                    final int thisHour = dt.get(Calendar.HOUR_OF_DAY);
+//
+//                    final int thisMin = dt.get(Calendar.MINUTE);
+//
+//                    final int thisSec = dt.get(Calendar.SECOND);
+//
+//                    handler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            mAutoOpenTV.setText("" + Integer.toString(thisYear)+"/" + Integer.toString(thisMonth)+"/" + Integer.toString(thisDate)+" " + Integer.toString(thisHour)+":" + Integer.toString(thisMin)+":" + Integer.toString(thisSec));
+//                        }
+//                    });
+
                     if(!isScanning&&!isEditDeviceName) {
                         BLE_Scanner_Start(true);
                         //Util.debugMessage(TAG,"rescan",true);
                     }
+
                     checkDeviceAlive();
+
                     try{
-                      Thread.sleep(5000);
+                        Thread.sleep(5000);
+
 
                     }catch(java.lang.InterruptedException e){
 
                     }
+
+
+
+
                 }
             }
         });
@@ -987,13 +1139,13 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     private void StopScanningTimer(){
 
         ScanningTimerFlag = false;
-        //BLE_Scanner_Start(false);
+        BLE_Scanner_Start(false);
         if(scaningTimer!=null)
-        scaningTimer.interrupt();
+            scaningTimer.interrupt();
         scaningTimer = null;
     }
     private void StartBgAutoTimer(){
-            bgAutoTimerflag = true;
+        bgAutoTimerflag = true;
 
     }
     private void CreateBgAutoTimer(){
@@ -1013,14 +1165,14 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                             if ( !isOpenDoor)
                                 Util.debugMessage(TAG, "!isOpenDoor", debugFlag);
                             if (deviceInfoList.size() > 0)
-                            Util.debugMessage(TAG, "deviceInfoList.size() > 0", debugFlag);
+                                Util.debugMessage(TAG, "deviceInfoList.size() > 0", debugFlag);
                             if ((deviceInfoList.size() > 0) && !isOpenDoor) {
                                 Util.debugMessage(TAG, "deviceInfoList.size() > 0", debugFlag);
                                 selectTarget = getTargetDevice();
                                 targetBdAddr = selectTarget.getAddress();
                                 isTriggerOpenDoor = checkConnectLimitTime(targetBdAddr);
                                 if(selectTarget != null)
-                                Util.debugMessage(TAG, "selectTarget != null", debugFlag);
+                                    Util.debugMessage(TAG, "selectTarget != null", debugFlag);
                                 if(isTriggerOpenDoor)
                                     Util.debugMessage(TAG, "isTriggerOpenDoor", debugFlag);
                             }
@@ -1029,8 +1181,14 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                                 int expectLEVEL = loadDeviceRSSILevel(targetBdAddr);
                                 int currrentLEVEL = APPConfig.Convert_RSSI_to_LEVEL(getCurrLevel(targetBdAddr));
                                 Util.debugMessage(TAG, "currrentLEVEL=" + currrentLEVEL + "expectLEVEL" + expectLEVEL, debugFlag);
-                                if (expectLEVEL >= currrentLEVEL) {
+                                if (expectLEVEL >= currrentLEVEL && !isBackground(HomeActivity.this)) {
                                     //BLE_Scanner_Start(true);
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            start_anime();
+                                        }
+                                    });
                                     if (connect(targetBdAddr))
                                         Util.debugMessage(TAG, "auto connect ok", debugFlag);
                                     else
@@ -1089,7 +1247,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         postman.putString(APPConfig.deviceBddrTag,selectDevice.getAddress());
         postman.putString(APPConfig.deviceModelTag,deviceInfo.Model);
         if(!isAdmin){
-         int RSSI = getTargetCurrRSSI(selectDevice.getAddress());
+            int RSSI = getTargetCurrRSSI(selectDevice.getAddress());
 
             postman.putInt(APPConfig.RSSI_LEVEL_Tag,RSSI);
             intent.setClass(this,UserSettingActivity.class);
@@ -1101,28 +1259,36 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
         overridePendingTransitionRightToLeft();
         if(isConService){
-         unbindService(ServiceConnection);
-         unregisterReceiver(mGattUpdateReceiver);
+            unbindService(ServiceConnection);
+            unregisterReceiver(mGattUpdateReceiver);
             isConService = false;
         }
     }
 
     private void updateView(View show) {
-       mCurrentView = show;
+        stop_anime();
+        mCurrentView = show;
         //Util.debugMessage(TAG,"updateView",debugFlag);
         mCurrentView.setVisibility(View.GONE);
         if (mCurrentView == mSearchingV) {
             //mProgressBarV.setVisibility(View.GONE);
+            mModelTV.setVisibility(View.INVISIBLE);
+            mAutoRangeSettingValueV.setVisibility(View.INVISIBLE);
         } else if (mCurrentView == mNotFoundV) {
             mRefreshIB.setVisibility(View.GONE);
+            mModelTV.setVisibility(View.INVISIBLE);
+            mAutoRangeSettingValueV.setVisibility(View.INVISIBLE);
         } else if (mCurrentView == mFoundV) {
-           // Util.debugMessage(TAG,"foundV",debugFlag);
+            // Util.debugMessage(TAG,"foundV",debugFlag);
             mOpenBtn.setVisibility(View.GONE);
             mOpenedIB.setVisibility(View.GONE);
             mDoorIB.setImageResource(R.drawable.door_close);
+            mDoorIB.setEnabled(true);
             mDoorStatusTV.setText(R.string.door_closed);
-            mDoorStatusTV.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            mDoorStatusTV.setTextColor(getResources().getColor(android.R.color.black));
 
+            mModelTV.setVisibility(View.VISIBLE);
+            mAutoRangeSettingValueV.setVisibility(View.VISIBLE);
         }
 
         show.setVisibility(View.VISIBLE);
@@ -1170,8 +1336,8 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(isForce){
                     if(forceDevice.getName().equals(deviceList[position])){
-                       mDeviceV.setDeviceName(forceDevice.getName());
-                       mDeviceV.setSelection(false);
+                        mDeviceV.setDeviceName(forceDevice.getName());
+                        mDeviceV.setSelection(false);
                         isForce = false;
                     }else{
                         Util.debugMessage(TAG,"device Addr="+deviceListObj.scanItems.get(position).dev_addr,debugFlag);
@@ -1184,10 +1350,10 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                     }
                 }else{
 
-                      isForce  = true;
-                      forceDevice  = mBluetoothAdapter.getRemoteDevice(deviceListObj.scanItems.get(position).dev_addr);
-                      mDeviceV.setDeviceName(forceDevice.getName());
-                      mDeviceV.setSelection(true);
+                    isForce  = true;
+                    forceDevice  = mBluetoothAdapter.getRemoteDevice(deviceListObj.scanItems.get(position).dev_addr);
+                    mDeviceV.setDeviceName(forceDevice.getName());
+                    mDeviceV.setSelection(true);
                 }
                 dialog.dismiss();
             }
@@ -1204,17 +1370,19 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
             StartScanningTimer();
             StopBgAutoTimer();
             isAutoMode = false;
-           // bgAutoTimer = null;
+            // bgAutoTimer = null;
             sharedPreferences.edit().putBoolean(APPConfig.isAutoTag,false).commit();
-            mAutoOpenTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.checkbox_none, 0, 0, 0);
+//            mAutoOpenTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.checkbox_none, 0, 0, 0);
+            mAutoOpenTV.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.checkbox_none, 0, 0, 0);
         } else {
             Util.debugMessage(TAG,"auto on",debugFlag);
-            StopScanningTimer();
+//            StopScanningTimer();
             CreateBgAutoTimer();
             StartBgAutoTimer();
             isAutoMode = true;
             sharedPreferences.edit().putBoolean(APPConfig.isAutoTag,true).commit();
-            mAutoOpenTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.checkbox_tick, 0, 0, 0);
+//            mAutoOpenTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.checkbox_tick, 0, 0, 0);
+            mAutoOpenTV.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.checkbox_tick, 0, 0, 0);
         }
 
         mIsAutoOpen = !mIsAutoOpen;
@@ -1234,16 +1402,16 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
     private int getCurrLevel(String bdAddr){
 
-         if(deviceInfoList.size() > 0){
+        if(deviceInfoList.size() > 0){
 
-             for(int i=0;i<deviceInfoList.size();i++){
-                 if(deviceInfoList.scanItems.get(i).dev_addr.equals(bdAddr)){
-                     return  deviceInfoList.scanItems.get(i).rssi;
-                 }
-             }
+            for(int i=0;i<deviceInfoList.size();i++){
+                if(deviceInfoList.scanItems.get(i).dev_addr.equals(bdAddr)){
+                    return  deviceInfoList.scanItems.get(i).rssi;
+                }
+            }
 
-          }
-          return 0;
+        }
+        return 0;
     }
     private void checkDeviceAlive(){
 
@@ -1252,16 +1420,16 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
             need_Check_Alive = true;
         else {
             need_Check_Alive = false;
-           // BLE_Scanner_Start(true);
+            // BLE_Scanner_Start(true);
         }
         if(need_Check_Alive){
-              for(int i=0;i<deviceInfoList.size();i++){
+            for(int i=0;i<deviceInfoList.size();i++){
 
-                  deviceInfoList.scanItems.get(i).alive_cnt -= 1;
-                 if(deviceInfoList.scanItems.get(i).alive_cnt <=0){
-                            deviceInfoList.scanItems.remove(i);
-                  }
-              }
+                deviceInfoList.scanItems.get(i).alive_cnt -= 1;
+                if(deviceInfoList.scanItems.get(i).alive_cnt <=0){
+                    deviceInfoList.scanItems.remove(i);
+                }
+            }
 
         }
         runOnUiThread(new Runnable() {
@@ -1280,24 +1448,25 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     private BluetoothDevice getTargetDevice(){
         BluetoothDevice target = null;
 
-         if(isForce){
-             Util.debugMessage(TAG,"isForce",debugFlag);
-             target = forceDevice;
-         }else{
+        if(isForce){
+            Util.debugMessage(TAG,"isForce",debugFlag);
+            target = forceDevice;
+        }else{
 
-             int current_level = APPConfig.Convert_RSSI_to_LEVEL(deviceInfoList.scanItems.get(0).rssi);
-             Util.debugMessage(TAG,"current Level ="+current_level, debugFlag);
-             target  = mBluetoothAdapter.getRemoteDevice(deviceInfoList.scanItems.get(0).dev_addr);
-             for(int i =0; i<deviceInfoList.size();i++){
-                 Util.debugMessage(TAG,"next Level ="+APPConfig.Convert_RSSI_to_LEVEL(deviceInfoList.scanItems.get(i).rssi), debugFlag);
-                  if(APPConfig.Convert_RSSI_to_LEVEL(deviceInfoList.scanItems.get(i).rssi) > current_level){
-                     target  = mBluetoothAdapter.getRemoteDevice(deviceInfoList.scanItems.get(i).dev_addr);
-                      current_level =  deviceInfoList.scanItems.get(i).rssi;
-                  }
-             }
-             Util.debugMessage(TAG,"target addr="+target.getAddress(),debugFlag);
+//             int current_level = APPConfig.Convert_RSSI_to_LEVEL(deviceInfoList.scanItems.get(0).rssi);
+//             Util.debugMessage(TAG,"current Level ="+current_level, debugFlag);
+//             target  = mBluetoothAdapter.getRemoteDevice(deviceInfoList.scanItems.get(0).dev_addr);
+//             for(int i =0; i<deviceInfoList.size();i++){
+//                 Util.debugMessage(TAG,"next Level ="+APPConfig.Convert_RSSI_to_LEVEL(deviceInfoList.scanItems.get(i).rssi), debugFlag);
+//                  if(APPConfig.Convert_RSSI_to_LEVEL(deviceInfoList.scanItems.get(i).rssi) > current_level){
+//                     target  = mBluetoothAdapter.getRemoteDevice(deviceInfoList.scanItems.get(i).dev_addr);
+//                      current_level =  deviceInfoList.scanItems.get(i).rssi;
+//                  }
+//             }
+//             Util.debugMessage(TAG,"target addr="+target.getAddress(),debugFlag);
+            target  = mBluetoothAdapter.getRemoteDevice(deviceInfoList.scanItems.get(0).dev_addr);
 
-         }
+        }
 
         return target;
     }
@@ -1306,13 +1475,13 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     private ScanItem getDeviceInfo(BluetoothDevice device){
 
 
-            int foundIndex = 0;
-            for(int i =0; i<deviceInfoList.size();i++){
-                if(deviceInfoList.scanItems.get(i).dev_addr.equals(device.getAddress())){
-                    foundIndex = i ;
-                    break;
-                }
+        int foundIndex = 0;
+        for(int i =0; i<deviceInfoList.size();i++){
+            if(deviceInfoList.scanItems.get(i).dev_addr.equals(device.getAddress())){
+                foundIndex = i ;
+                break;
             }
+        }
 
 
 
@@ -1328,30 +1497,30 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         }
         return -999;
     }
-   /* private boolean checkRssiLevelLimit(String bdAddr){
-        /*int RSSI;
-        Util.debugMessage(TAG,"BD address ="+bdAddr,debugFlag);
-        int index = 999999;
-        for(int i=0;i<deviceNearestScanInfo.scanItems.size();i++){
-            if(mDevicesItemsArrayList.size()>0 && bdAddr.equals(mDevicesItemsArrayList.get(i).dev_addr)){
-                index = i;
-                break;
-            }
-        }
-        if(index !=999999)
-            RSSI = Integer.parseInt(mDevicesItemsArrayList.get(index).getRssi_current_level_text(true));
-        else
-            RSSI = 999999;
-        int limt_rssi =  mNkiDevices_data.get_device_expect_rssi_level_by_addr(bdAddr);
-        Util.debugMessage(TAG,"limt_rssi ="+limt_rssi +",rssi="+ RSSI,debugFlag);
-        if(limt_rssi >=  RSSI)
-            return true;
-        else
-            return false;
+    /* private boolean checkRssiLevelLimit(String bdAddr){
+         /*int RSSI;
+         Util.debugMessage(TAG,"BD address ="+bdAddr,debugFlag);
+         int index = 999999;
+         for(int i=0;i<deviceNearestScanInfo.scanItems.size();i++){
+             if(mDevicesItemsArrayList.size()>0 && bdAddr.equals(mDevicesItemsArrayList.get(i).dev_addr)){
+                 index = i;
+                 break;
+             }
+         }
+         if(index !=999999)
+             RSSI = Integer.parseInt(mDevicesItemsArrayList.get(index).getRssi_current_level_text(true));
+         else
+             RSSI = 999999;
+         int limt_rssi =  mNkiDevices_data.get_device_expect_rssi_level_by_addr(bdAddr);
+         Util.debugMessage(TAG,"limt_rssi ="+limt_rssi +",rssi="+ RSSI,debugFlag);
+         if(limt_rssi >=  RSSI)
+             return true;
+         else
+             return false;
 
 
-    }
-                                                                */
+     }
+                                                                 */
     private boolean checkConnectLimitTime(String bdAddr){
         Calendar time = Calendar.getInstance();
         int min = time.get(Calendar.MINUTE);
@@ -1370,8 +1539,219 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     private void ForceDisconnect(){
         //disconnect();
         bpProtocol.getFW_version();
-
+        updateView(mFoundV);
     }
+
+
+
+
+    public static boolean isBackground(Context context) {
+        ActivityManager activityManager = (ActivityManager) context
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager
+                .getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.processName.equals(context.getPackageName())) {
+                /*
+                BACKGROUND=400 EMPTY=500 FOREGROUND=100
+                GONE=1000 PERCEPTIBLE=130 SERVICE=300 ISIBLE=200
+                 */
+                Log.i(context.getPackageName(), "此appimportace ="
+                        + appProcess.importance
+                        + ",context.getClass().getName()="
+                        + context.getClass().getName());
+                if (appProcess.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    Log.i(context.getPackageName(), "处于后台"
+                            + appProcess.processName);
+                    return true;
+                } else {
+                    Log.i(context.getPackageName(), "处于前台"
+                            + appProcess.processName);
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+
+
+
+//    private void StartAutoOpenningTimer(){
+//        AutoOpenflag = true;
+//
+//        autoOpenningTimer = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                while(true) {
+//                    while (AutoOpenflag) {
+//                        handler.post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                mDoorStatusTV.setTextColor(getApplicationContext().getResources().getColor(R.color.green));
+//
+//                                if (!mDoorStatusTV.getText().equals(getResources().getString(R.string.automatic_sensor_to_open))) {
+//                                    mDoorStatusTV.setText(getResources().getString(R.string.automatic_sensor_to_open));
+//                                } else {
+//                                    mDoorStatusTV.setText("");
+//                                }
+//
+//                            }
+//                        });
+//
+//                        try {
+//                            Thread.sleep(200);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//
+//
+//                    }
+//
+//                }
+//
+//            }
+//
+//        });
+//        autoOpenningTimer.start();
+//    }
+//
+//
+//
+//
+//
+//
+//    private  void StopAutoOpenningTimer() {
+//        AutoOpenflag = false;
+//        if (autoOpenningTimer != null)
+//        {
+//            autoOpenningTimer.interrupt();
+//        }
+//        autoOpenningTimer = null;
+//
+//        mDoorStatusTV.setTextColor(getApplicationContext().getResources().getColor(R.color.gray));
+//        mDoorStatusTV.setText("");
+//
+//    }
+
+
+
+
+
+    public void start_anime()
+    {
+        infoOperatingIV = (ImageView)findViewById(R.id.infoOperating);
+        Animation operatingAnim = AnimationUtils.loadAnimation(this, R.anim.tip);
+        LinearInterpolator lin = new LinearInterpolator();
+        operatingAnim.setInterpolator(lin);
+        if (operatingAnim != null) {
+            infoOperatingIV.startAnimation(operatingAnim);
+        }
+    }
+
+
+    public void stop_anime()
+    {
+        infoOperatingIV = (ImageView)findViewById(R.id.infoOperating);
+        infoOperatingIV.clearAnimation();
+    }
+
+
+
+    public void check_BT_HomeActivity(boolean StartScanningTimerFlag)
+    {
+        if (!isShowing_BT_dialog) {
+            if ((mBluetoothAdapter == null) || (!mBluetoothAdapter.isEnabled())) {
+                isShowing_BT_dialog = true;
+                Intent enableBtIntent = new Intent(
+                        BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            } else {
+                if (StartScanningTimerFlag) {
+                    mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
+
+                    //mLEScanner = mBluetoothAdapter;
+                    mLEScanSettings = new ScanSettings.Builder()
+                            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                            .build();
+
+                    mLEScanFilters = new ArrayList<>();
+                    ScanFilter filter = new ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(RBLService.UUID_BLE_E3K_SERVICE.toString())).build();
+                    mLEScanFilters.add(filter);
+                    // BLE_Scanner_Start(true);
+//            if(!isAutoMode)
+                    StartScanningTimer();
+                }
+            }
+        }
+    }
+
+
+
+    public void check_GPS_HomeActivity()
+    {
+
+        if (!isShowing_GPS_dialog) {
+            final LocationManager locManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            if (!locManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                isShowing_GPS_dialog = true;
+                // show open gps message
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setCancelable(false);
+//            builder.setTitle(R.string.gps_warning);
+//            builder.setMessage(R.string.no_gps);
+                builder.setMessage(R.string.need_gps);
+                builder.setNegativeButton(getString(R.string.cancel), new
+                        android.content.DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int id = android.os.Process.myPid();
+                                android.os.Process.killProcess(id);
+                            }
+                        });
+                builder.setPositiveButton(getString(R.string.ok), new
+                        android.content.DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // jump to setting
+                                if (!locManager.isProviderEnabled((LocationManager.GPS_PROVIDER)) && !locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                                    Intent enableGPSIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//                                startActivity(enableGPSIntent);
+                                    startActivityForResult(enableGPSIntent, REQUEST_ENABLE_LOCATION);
+                                }
+                            }
+                        });
+                builder.show();
+            }
+        }
+    }
+
+
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ENABLE_BT)
+        {
+            isShowing_BT_dialog = false;
+            if ((mBluetoothAdapter == null) || (!mBluetoothAdapter.isEnabled())) {
+                int id = android.os.Process.myPid();
+                android.os.Process.killProcess(id);
+
+            }
+        }
+
+        if (requestCode == REQUEST_ENABLE_LOCATION)
+        {
+            isShowing_GPS_dialog = false;
+            check_GPS_HomeActivity();
+        }
+    }
+
+
 
 
 

@@ -2,6 +2,7 @@ package com.anxell.e5ar.custom;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -22,7 +23,7 @@ public class MyDeviceView extends FrameLayout {
         LayoutInflater.from(context).inflate(R.layout.my_device_view, this);
 
         mDeviceNameTV = (FontTextView) findViewById(R.id.foundDeviceName);
-
+        mDeviceNameTV.setTextColor(Color.BLACK);
         showMyAttrs(context, attrs);
     }
 
@@ -57,10 +58,10 @@ public class MyDeviceView extends FrameLayout {
     }
 
     public void setSelection(boolean selection){
-            if(selection)
-                mDeviceNameTV.setTextColor(getResources().getColor(R.color.dark_yellow));
-            else
-                mDeviceNameTV.setTextColor(getResources().getColor(R.color.gray4));
+        if(selection)
+            mDeviceNameTV.setTextColor(getResources().getColor(R.color.dark_yellow));
+        else
+            mDeviceNameTV.setTextColor(Color.BLACK);
 
 
     }

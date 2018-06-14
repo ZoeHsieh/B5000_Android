@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">E5AKR</string>
+    <string name="app_name">ROFU B5000</string>
 
     <string name="bluetooth_access_control_system">Bluetooth Access Control System</string>
-    <string name="anxell_technology_coproration">&#169; 2017 Anxell Technology Coproration</string>
+    <string name="anxell_technology_coproration">© 2018 Copyright ROFU Security International Corp.</string>
 
     <string name="hello">Hello!</string>
     <string name="welcome">Welcome</string>
@@ -195,28 +195,33 @@
     <string name="users_pwd_edit_dialog_title">Cambiar contraseña</string>
     <string name="Confirm">Confirmar</string>
     <string name="APP_version"> Versión App:</string>
-    <string name="over_range_alarm">Over range</string>
-    <string name="settings_Admin_card">Admin Card/Tag</string>
-    <string name="settings_Admin_card_Edit">Edit Admin Card/Tag</string>
-    <string name="tamper_sensor_Level">Tamper Sensor Level</string>
+    <string name="over_range_alarm">Fuera de parámetro, escribir un número entre 0 y 255</string>
+    <string name="settings_Admin_card">Administrador tarjeta/llavero</string>
+    <string name="settings_Admin_card_Edit">Modificación administrador tarjeta/llavero</string>
+    <string name="tamper_sensor_Level">Nivel de sensor de tamper</string>
     <string name="_10_digits">10 digits</string>
     <string name="enable_phone_access">Phone Access</string>
-    <string name="openType_Card">Card/Tag</string>
+    <string name="openType_Card">Tarjeta/llavero</string>
     <string name="enable_card_access">Card Access</string>
-    <string name="users_manage_edit_status_Admin_card">Invalid Card!!</string>
-    <string name="users_manage_edit_status_duplication_card">Card/Tag Duplication!!</string>
-    <string name="Card">Card/Tag</string>
-    <string name="users_card_edit_dialog_title">Edit Card/Tag: (10 digits)</string>
-    <string name="Level_1">Level 1</string>
-    <string name="Level_2">Level 2</string>
-    <string name="Level_3">Level 3</string>
-    <string name="UserList_search_placeHolder">Please input User ID</string>
-    <string name="History_search_placeHolder">Please input User ID</string>
+    <string name="users_manage_edit_status_Admin_card">Tarjeta/llaveros inválida</string>
+    <string name="users_manage_edit_status_duplication_card">Duplicación tarjeta/llavero</string>
+    <string name="Card">Tarjeta/llavero</string>
+    <string name="users_card_edit_dialog_title">Modificación tarjeta/llavero: 10 digitos</string>
+    <string name="Level_1">Nivel 1 alta sensibilidad</string>
+    <string name="Level_2">Nivel 2 media sensibilidad</string>
+    <string name="Level_3">Nivel 3 baja sensibilidad</string>
+    <string name="UserList_search_placeHolder">Escribir un ID para encontrar al usuario</string>
+    <string name="History_search_placeHolder">Escribir un ID para encontrar al usuario</string>
     <string name="EnglishCharsAndNumber">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
 
     <string name="open_fail_permission_denied">Acceso negado. Ponte en contacto con el Administrador</string>
     <string name="open_fail_no_eroll">Acceso negado. Realizar antes el registro</string>
     <string name="eroll_fail">Registro fallido</string>
     <string name="eroll_success">Correcto, estás registrado</string>
+
+    <string name="permission_title">Functionality limited</string>
+    <string name="permission_message_location">Since location access has not been granted, this app will not be able to discover beacons.</string>
+    <string name="permission_message_storage">Since storage access has not been granted, this app will not be able to backup settings.</string>
+    <string name="need_gps">Android OS 6.0 and up require to enable Location service to find nearby Bluetooth devices. Make sure to enable Location service on your phone.</string>
 
 </resources>

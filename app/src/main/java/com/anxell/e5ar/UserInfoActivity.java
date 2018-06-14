@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.text.Editable;
@@ -37,6 +38,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import static com.anxell.e5ar.util.Util.closeSoftKeybord;
+import static com.anxell.e5ar.util.Util.showSoftKeyboard;
 
 public class UserInfoActivity extends bpActivity implements View.OnClickListener {
             private final String TAG = UserInfoActivity.class.getSimpleName().toString();
@@ -655,6 +659,8 @@ public class UserInfoActivity extends bpActivity implements View.OnClickListener
                     }else
                         GeneralDialog.MessagePromptDialog(currActivity,"", getResources().getString(R.string.users_manage_edit_status_Admin_card));
                 }
+
+                closeSoftKeybord((EditText)item.findViewById(R.id.editText_Users_Edit_Dialog_Card1),UserInfoActivity.this);
             }
         });
 
@@ -662,6 +668,7 @@ public class UserInfoActivity extends bpActivity implements View.OnClickListener
             @Override
             public void onClick(DialogInterface dialog, int which) {
 //                nki_show_toast_msg("Cancel !!");
+                closeSoftKeybord((EditText)item.findViewById(R.id.editText_Users_Edit_Dialog_Card1),UserInfoActivity.this);
             }
         });
 
@@ -729,7 +736,14 @@ public class UserInfoActivity extends bpActivity implements View.OnClickListener
                 }
             });
         }
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+//        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        new Handler().postDelayed(new Runnable(){
+            public void run(){
+                //處理少量資訊或UI
+//                alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                showSoftKeyboard((EditText)item.findViewById(R.id.editText_Users_Edit_Dialog_Card1),UserInfoActivity.this);
+            }
+        }, 200);
         dialog.show();
 
 

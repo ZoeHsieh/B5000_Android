@@ -4,11 +4,11 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
     defaultConfig {
-        applicationId "com.anxell.e5akr"
+        applicationId "com.rofu.B5000"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 2
-        versionName "1.03"
+        versionCode 2  //0611
+        versionName "1.1" //0611
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -26,7 +26,7 @@ dependencies {
     })
 
 
-
+    compile 'net.vidageek:mirror:1.6.1'  //0328
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:percent:22.2.0'

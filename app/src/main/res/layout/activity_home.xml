@@ -64,9 +64,9 @@
             android:gravity="center"
             android:paddingTop="5dp"
             android:singleLine="true"
-            android:text="@string/model"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="@dimen/text_size_12"
+            android:text=""
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16"
             app:layout_widthPercent="60%" />
 
         <com.anxell.e5ar.custom.FontButton
@@ -83,7 +83,7 @@
             android:paddingTop="20dp"
             android:text="@string/setting"
             android:textAllCaps="false"
-            android:textColor="@color/gray4"
+            android:textColor="@android:color/black"
             android:textSize="@dimen/text_size_12" />
 
         <com.anxell.e5ar.custom.FontButton
@@ -100,7 +100,7 @@
             android:paddingTop="20dp"
             android:text="@string/Enroll"
             android:textAllCaps="false"
-            android:textColor="@color/gray4"
+            android:textColor="@android:color/black"
             android:textSize="@dimen/text_size_12" />
     </android.support.percent.PercentRelativeLayout>
 
@@ -238,6 +238,7 @@
                     android:layout_centerInParent="true"
                     android:indeterminateDrawable="@drawable/progress_bar_white" />
 
+
             </android.support.percent.PercentRelativeLayout>
 
         </android.support.percent.PercentRelativeLayout>
@@ -248,16 +249,28 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:drawableLeft="@drawable/checkbox_none"
+            android:drawableStart="@drawable/checkbox_none"
             android:drawablePadding="10dp"
             android:gravity="center_vertical"
             android:paddingEnd="20dp"
             android:paddingStart="20dp"
             android:paddingTop="5dp"
             android:text="@string/automatic_sensor_to_open"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@android:color/black"
             android:textSize="@dimen/text_size_16"
-            app:layout_marginBottomPercent="15%" />
+            app:layout_marginBottomPercent="25%" />
+
+        <TextView
+            android:id="@+id/auto_range_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16"
+            app:layout_marginBottomPercent="10%"
+            android:text="Auto_range_setting" />
+
     </android.support.percent.PercentRelativeLayout>
 
     <android.support.percent.PercentRelativeLayout
@@ -299,7 +312,19 @@
             android:scaleType="fitCenter"
             android:src="@drawable/plants"
             app:layout_marginBottomPercent="6.5%"
-            app:layout_marginLeftPercent="8%" />
+            app:layout_marginStartPercent="8%" />
+
+        <ImageView
+            android:id="@+id/infoOperating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/signal_icon"
+            android:scaleType="fitCenter"
+            android:layout_centerInParent="true"
+            app:layout_heightPercent="50%"
+            app:layout_widthPercent="50%"
+            android:visibility="invisible">
+        </ImageView>
     </android.support.percent.PercentRelativeLayout>
 
 </android.support.percent.PercentRelativeLayout>

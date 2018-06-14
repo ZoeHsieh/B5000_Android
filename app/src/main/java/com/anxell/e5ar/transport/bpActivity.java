@@ -2,6 +2,7 @@ package com.anxell.e5ar.transport;
 
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
@@ -17,6 +18,7 @@ import android.os.Process;
 import android.provider.Settings;
 //import android.support.v7.app.AppCompatActivity;
 import android.content.ServiceConnection;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
@@ -24,7 +26,10 @@ import com.anxell.e5ar.BaseActivity;
 import com.anxell.e5ar.HomeActivity;
 import com.anxell.e5ar.data.HistoryData;
 import com.anxell.e5ar.data.UserData;
+import com.anxell.e5ar.util.InstallationID;
 import com.anxell.e5ar.util.Util;
+
+import net.vidageek.mirror.dsl.Mirror;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,18 +81,47 @@ public class bpActivity extends BaseActivity {
         return 0;
     }
 
+//    public void update_system_ble_mac_addrss() {
+//        //Get System BLE MAC Address
+//        mSYS_BLE_MAC_Address = Settings.Secure.getString(getApplicationContext().getContentResolver(), "bluetooth_address");
+//
+//        //ble_mac_addr_Value.setText(mSYS_BLE_MAC_Address);
+//
+//        mSYS_BLE_MAC_Address_RAW = Util.hexStringToByteArray(mSYS_BLE_MAC_Address.replaceAll(":", ""));
+//
+//        Util.debugMessage(TAG, "update_system_ble_mac_addrss(): " + mSYS_BLE_MAC_Address,debugFlag);
+//
+//        //nki_show_toast_msg(mSYS_BLE_MAC_Address);
+//    }
+
+
+    //修正bt  0328
     public void update_system_ble_mac_addrss() {
         //Get System BLE MAC Address
-        mSYS_BLE_MAC_Address = Settings.Secure.getString(getApplicationContext().getContentResolver(), "bluetooth_address");
+
+//        mSYS_BLE_MAC_Address = Settings.Secure.getString(getApplicationContext().getContentResolver(), "bluetooth_address");
+//        mSYS_BLE_MAC_Address = getBluetoothAddress();
+//        mSYS_BLE_MAC_Address = GetLocalMacAddress();
+        //mSYS_BLE_MAC_Address = getBtAddressViaReflection();
+        //if (mSYS_BLE_MAC_Address == null || mSYS_BLE_MAC_Address.equals("02:00:00:00:00:00"))
+        //{
+            mSYS_BLE_MAC_Address = InstallationID.id(bpActivity.this);
+            mSYS_BLE_MAC_Address = mSYS_BLE_MAC_Address.substring(mSYS_BLE_MAC_Address.length()-12);
+       // }
 
         //ble_mac_addr_Value.setText(mSYS_BLE_MAC_Address);
+//        Util.debugMessage(TAG, "UUUUUUUUUupdate_system_ble_mac_addrss(): " + mSYS_BLE_MAC_Address,true);
+//        show_toast_msg("UUUUUUUUUupdate_system_ble_mac_addrss(): " + mSYS_BLE_MAC_Address);
 
         mSYS_BLE_MAC_Address_RAW = Util.hexStringToByteArray(mSYS_BLE_MAC_Address.replaceAll(":", ""));
 
-        Util.debugMessage(TAG, "update_system_ble_mac_addrss(): " + mSYS_BLE_MAC_Address,debugFlag);
-
+//        Util.debugMessage(TAG, "update_system_ble_mac_addrss(): " + mSYS_BLE_MAC_Address,debugFlag);
+        return;
         //nki_show_toast_msg(mSYS_BLE_MAC_Address);
     }
+
+
+
     protected void onStop() {
         /*try{
             unregisterReceiver(this.mGattUpdateReceiver);
@@ -551,5 +585,23 @@ if(CmdWorkerThread == null){
                 BLEReady();
         }
     };
+
+     //0328
+    private String getBtAddressViaReflection() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Object bluetoothManagerService = new Mirror().on(bluetoothAdapter).get().field("mService");
+        if (bluetoothManagerService == null) {
+            Log.w(TAG, "couldn't find bluetoothManagerService");
+            return null;
+        }
+        Object address = new Mirror().on(bluetoothManagerService).invoke().method("getAddress").withoutArgs();
+        if (address != null && address instanceof String) {
+            Log.w(TAG, "using reflection to get the BT MAC address: " + address);
+            return (String) address;
+        } else {
+            return null;
+        }
+    }
+
 
 }

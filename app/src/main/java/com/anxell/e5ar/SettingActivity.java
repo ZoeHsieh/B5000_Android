@@ -1,9 +1,11 @@
 package com.anxell.e5ar;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputType;
@@ -14,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -41,6 +44,8 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.anxell.e5ar.util.Util.showSoftKeyboard;
 
 public class SettingActivity extends bpActivity implements View.OnClickListener {
     private String TAG = SettingActivity.class.getSimpleName().toString();
@@ -157,11 +162,15 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         updateStatus = up_none;
     }
 
+
+
     @Override
     protected void onStop() {
         super.onStop();
         //unRegisterReceiver(this);
     }
+
+
 
     private void findViews() {
         mDeviceNameTV = (My4TextView) findViewById(R.id.deviceName);
@@ -391,8 +400,15 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
     }
 
     private void openProximityReadPage() {
-        readRSSI();
+//        readRSSI();
+        Intent intent = new Intent(this, ProximityReadRangeActivity1.class);
 
+//        intent.putExtra(APPConfig.RSSI_LEVEL_Tag,curr_rssi_level);
+        intent.putExtra(APPConfig.deviceBddrTag,deviceBDDR);
+//        Util.debugMessage(TAG,"RSSI="+curr_rssi_level+"deviceBDDR="+deviceBDDR,debugFlag);
+
+        startActivity(intent);
+        overridePendingTransitionRightToLeft();
     }
 
     private void openDoorReLockTimePage() {
@@ -587,7 +603,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         dialogBuilder.setTitle(R.string.settings_Admin_card_Edit);
 
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.admin_edit_card_dialog, null);
+        final View dialogView = inflater.inflate(R.layout.admin_edit_card_dialog, null);
         dialogBuilder.setView(dialogView);
         final EditText ArrayCard[] = new EditText[10];
         final int uiCardEditID []={R.id.editText_Admin_Edit_Dialog_Card1,R.id.editText_Admin_Edit_Dialog_Card2,
@@ -598,7 +614,9 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         };
         dialogBuilder.setPositiveButton(R.string.Confirm, null);
         dialogBuilder.setNeutralButton(R.string.cancel, null);
+
         final AlertDialog alertDialog = dialogBuilder.create();
+
         alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 
             @Override
@@ -713,8 +731,20 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         }
 
 
-        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        new Handler().postDelayed(new Runnable(){
+            public void run(){
+                //處理少量資訊或UI
+//                alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                showSoftKeyboard((EditText)dialogView.findViewById(R.id.editText_Admin_Edit_Dialog_Card1),SettingActivity.this);
+            }
+        }, 200);
+
         alertDialog.show();
+
+
+
+
+
     }
     private void showReLockTimeDialog(String currentTime) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -851,7 +881,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
 
     @Override
     public void update_RSSI(String rssi) {
-        Intent intent = new Intent(this, ProximityReadRangeActivity2.class);
+        Intent intent = new Intent(this, ProximityReadRangeActivity1.class);
         int currLevel = APPConfig.Convert_RSSI_to_LEVEL(Integer.parseInt(rssi));
         intent.putExtra(APPConfig.RSSI_LEVEL_Tag,currLevel);
         intent.putExtra(APPConfig.deviceBddrTag,deviceBDDR);
@@ -1498,6 +1528,12 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
         bpProtocol.setDeviceTime(tmpTime);
 
     }
+
+
+
+
+
+
 
 
 }

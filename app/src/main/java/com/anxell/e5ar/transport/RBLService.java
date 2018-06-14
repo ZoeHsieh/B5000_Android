@@ -37,6 +37,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.anxell.e5ar.HomeActivity;
 import com.anxell.e5ar.util.Util;
 
 /**
@@ -49,7 +50,7 @@ public class RBLService extends Service {
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
 	private String mBluetoothDeviceAddress;
-	private BluetoothGatt mBluetoothGatt;
+	public static BluetoothGatt mBluetoothGatt;
 	private String tmpConAddr="";
 	private boolean isNeedConnection = false;
 	public final static String ACTION_GATT_CONNECTED = "ACTION_GATT_CONNECTED";
@@ -60,8 +61,8 @@ public class RBLService extends Service {
 	public final static String ACTION_DATA_AVAILABLE = "ACTION_DATA_AVAILABLE";
 	public final static String EXTRA_DATA = "EXTRA_DATA";
 	public final static String ACTION_GATT_WRITE_SUCCESS = "ACTION_GATT_WRITE_SUCCESS";
-    private final int BLE_Packet_MAX_LEN = 20;
-			
+	private final int BLE_Packet_MAX_LEN = 20;
+
 	public final static UUID UUID_BLE_E3K_SERVICE = UUID
 			.fromString(RBLGattAttributes.BLE_E3K_SERVICE);
 
@@ -71,7 +72,7 @@ public class RBLService extends Service {
 	private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
 		@Override
 		public void onConnectionStateChange(BluetoothGatt gatt, int status,
-				int newState) {
+											int newState) {
 			String intentAction;
 			boolean state;
 
@@ -88,10 +89,11 @@ public class RBLService extends Service {
 				Log.i(TAG, "Attempting to start service discovery:" + state);
 
 			} else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+				mBluetoothGatt.close();
 				intentAction = ACTION_GATT_DISCONNECTED;
 				Log.e(TAG,"get disconnect event");
 				if(status != 133)
-				broadcastUpdate(intentAction);
+					broadcastUpdate(intentAction);
 /*
 				try {
 					gatt.close();
@@ -100,9 +102,10 @@ public class RBLService extends Service {
 					Log.d(TAG, "close ignoring: " + e);
 				}
 */
+
 			}
 
-            if(status == 133){
+			if(status == 133){
 
 				close();
 				intentAction = ACTION_GATT_ERROR_133;
@@ -110,13 +113,12 @@ public class RBLService extends Service {
 				Log.e(TAG, "GET Status = 133 ERROR!!"+Address);
 
 				broadcastUpdate(intentAction,Address);
-            }else
-                Log.i(TAG, "Status = " + status);
+			}else
+				Log.i(TAG, "Status = " + status);
 		}
 		public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
-
-				broadcastUpdate(ACTION_GATT_RSSI, rssi);
+				broadcastUpdate("TWKAZUYA", rssi);
 			} else {
 				Log.i(TAG, "onReadRemoteRssi received: " + status);
 			}
@@ -133,7 +135,7 @@ public class RBLService extends Service {
 
 		@Override
 		public void onCharacteristicRead(BluetoothGatt gatt,
-				BluetoothGattCharacteristic characteristic, int status) {
+										 BluetoothGattCharacteristic characteristic, int status) {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
 				broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
 			}
@@ -141,7 +143,7 @@ public class RBLService extends Service {
 
 		@Override
 		public void onCharacteristicChanged(BluetoothGatt gatt,
-				BluetoothGattCharacteristic characteristic) {
+											BluetoothGattCharacteristic characteristic) {
 			broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
 		}
 
@@ -174,12 +176,12 @@ public class RBLService extends Service {
 	}
 
 	private void broadcastUpdate(final String action,
-			final BluetoothGattCharacteristic characteristic) {
+								 final BluetoothGattCharacteristic characteristic) {
 		final Intent intent = new Intent(action);
 
-        final byte[] rx = characteristic.getValue();
-        intent.putExtra(EXTRA_DATA, rx);
-        intent.putExtra("UUID", characteristic.getUuid().toString());
+		final byte[] rx = characteristic.getValue();
+		intent.putExtra(EXTRA_DATA, rx);
+		intent.putExtra("UUID", characteristic.getUuid().toString());
 
 		sendBroadcast(intent);
 	}
@@ -210,7 +212,7 @@ public class RBLService extends Service {
 
 	/**
 	 * Initializes a reference to the local Bluetooth adapter.
-	 * 
+	 *
 	 * @return Return true if the initialization is successful.
 	 */
 	public boolean initialize() {
@@ -236,10 +238,10 @@ public class RBLService extends Service {
 
 	/**
 	 * Connects to the GATT server hosted on the Bluetooth LE device.
-	 * 
+	 *
 	 * @param address
 	 *            The device address of the destination device.
-	 * 
+	 *
 	 * @return Return true if the connection is initiated successfully. The
 	 *         connection result is reported asynchronously through the
 	 *         {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
@@ -301,7 +303,6 @@ public class RBLService extends Service {
 		}
 		//Log.e("sean","disconnect bd address="+mBluetoothGatt.getDevice().getAddress().toString());
 		mBluetoothGatt.disconnect();
-
 		 /*Timer check =new Timer();
 		check.schedule(new TimerTask() {
 			@Override
@@ -329,7 +330,7 @@ public class RBLService extends Service {
 			return;
 		}
 		mBluetoothGatt.close();
-		mBluetoothGatt = null;
+//		mBluetoothGatt = null;
 	}
 
 	/**
@@ -337,7 +338,7 @@ public class RBLService extends Service {
 	 * result is reported asynchronously through the
 	 * {@code BluetoothGattCallback#onCharacteristicRead(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)}
 	 * callback.
-	 * 
+	 *
 	 * @param characteristic
 	 *            The characteristic to read from.
 	 */
@@ -376,38 +377,38 @@ public class RBLService extends Service {
 			return false;
 		}
 
-			ByteBuffer buff = ByteBuffer.wrap(data,0,data.length);
-			bpEncode encode = new bpEncode();
-		    byte tmp [];
-			while(buff.hasRemaining())
-			{
-				Util.debugMessage(TAG,"buff limit="+buff.remaining(),debugFlag);
-				if(buff.remaining()>20) {
-					tmp = new byte[BLE_Packet_MAX_LEN];
-					buff.get(tmp, 0, BLE_Packet_MAX_LEN);
-				}
-				else{
-				 	tmp=new byte[buff.remaining()];
-					buff.get(tmp,0,buff.remaining());
-				}
-				characteristic.setValue(tmp);
-				Util.debugMessage(TAG,"Data="+ encode.BytetoHexString(tmp),debugFlag);
-				res = mBluetoothGatt.writeCharacteristic(characteristic);
-				buff.flip();
-				if(res)
+		ByteBuffer buff = ByteBuffer.wrap(data,0,data.length);
+		bpEncode encode = new bpEncode();
+		byte tmp [];
+		while(buff.hasRemaining())
+		{
+			Util.debugMessage(TAG,"buff limit="+buff.remaining(),debugFlag);
+			if(buff.remaining()>20) {
+				tmp = new byte[BLE_Packet_MAX_LEN];
+				buff.get(tmp, 0, BLE_Packet_MAX_LEN);
+			}
+			else{
+				tmp=new byte[buff.remaining()];
+				buff.get(tmp,0,buff.remaining());
+			}
+			characteristic.setValue(tmp);
+			Util.debugMessage(TAG,"Data="+ encode.BytetoHexString(tmp),debugFlag);
+			res = mBluetoothGatt.writeCharacteristic(characteristic);
+			buff.flip();
+			if(res)
 				buff.compact();
-				else
-				 break;
-				tmp = null;
-				try{
-					Thread.sleep(300);
-				}catch(InterruptedException e)
-				{
-
-				}
-
+			else
+				break;
+			tmp = null;
+			try{
+				Thread.sleep(300);
+			}catch(InterruptedException e)
+			{
 
 			}
+
+
+		}
 
 
 		return res;
@@ -416,7 +417,7 @@ public class RBLService extends Service {
 
 	/**
 	 * Enables or disables notification on a give characteristic.
-	 * 
+	 *
 	 * @param characteristic
 	 *            Characteristic to act on.
 	 * @param enabled
@@ -430,10 +431,10 @@ public class RBLService extends Service {
 		}
 		mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
 		BluetoothGattDescriptor descriptor = characteristic
-					.getDescriptor(UUID
-							.fromString(RBLGattAttributes.BLE_E3K_CHAR_DESC));
-			descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-			mBluetoothGatt.writeDescriptor(descriptor);
+				.getDescriptor(UUID
+						.fromString(RBLGattAttributes.BLE_E3K_CHAR_DESC));
+		descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+		mBluetoothGatt.writeDescriptor(descriptor);
 
 
 	}
@@ -467,4 +468,7 @@ public class RBLService extends Service {
 	public String getBluetoothDeviceAddress() {
 		return mBluetoothDeviceAddress;
 	}
+
+
+
 }

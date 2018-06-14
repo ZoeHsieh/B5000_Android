@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -384,7 +385,7 @@ public class HistoryActivity extends bpActivity implements View.OnClickListener,
                 out.close();
 
                 Uri uriToImage;
-                uriToImage = Uri.fromFile(file);
+                uriToImage = FileProvider.getUriForFile(HistoryActivity.this, BuildConfig.APPLICATION_ID + ".provider",file);
 
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);

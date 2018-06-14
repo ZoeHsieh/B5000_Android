@@ -28,6 +28,7 @@ public class My2TextView extends FrameLayout {
         mValueTV = (FontTextView) findViewById(R.id.value);
         mIndicatorView = (ImageView) findViewById(R.id.indicator);
         mValueTV.setTextColor(getResources().getColor(R.color.gray2));
+//        mValueTV.setTextColor(getResources().getColor(R.color.green));
         showMyAttrs(context, attrs);
     }
 
@@ -40,19 +41,23 @@ public class My2TextView extends FrameLayout {
         if (!TextUtils.isEmpty(value)) {
             mValueTV.setText(value);
         }
+        else
+        {
+            mValueTV.setVisibility(View.GONE);
+        }
 
         boolean showIndicator = typedArray.getBoolean(R.styleable.MyFieldAttr_showIndicator, true);
         if (!showIndicator) {
-            findViewById(R.id.indicator).setVisibility(View.GONE);
+            findViewById(R.id.indicator).setVisibility(View.INVISIBLE);
         }
 
         typedArray.recycle();
     }
     public void setIndicatorViewVisibility(boolean enable){
         if(enable)
-        mIndicatorView.setVisibility(View.VISIBLE);
+            mIndicatorView.setVisibility(View.VISIBLE);
         else
-        mIndicatorView.setVisibility(View.GONE);
+            mIndicatorView.setVisibility(View.INVISIBLE);
     }
     public String getValue() {
         return mValueTV.getText().toString();

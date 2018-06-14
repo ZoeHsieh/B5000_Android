@@ -8,7 +8,7 @@ import android.support.compat.BuildConfig;
  */
 
 public class APPConfig {
-    public static final String SETTINGS_FILE_NAME   = "E5AR_Setting";
+    public static final String SETTINGS_FILE_NAME   = "Easiprox_Setting";
     public static final int	E3K_DEVICES_BLE_RSSI_MIN = (-115);
     public static final int	E3K_DEVICES_BLE_RSSI_MAX = (-35);
     public static final int	E3K_DEVICES_BLE_RSSI_SCALE = E3K_DEVICES_BLE_RSSI_MAX - E3K_DEVICES_BLE_RSSI_MIN;
@@ -48,11 +48,23 @@ public class APPConfig {
     public static final int loginCMDCntMax = 9;
     public static final int backupCMDCntMax = 4; //(not include user data)
     public static final int restoreCMDCntMax = 6;
-    public static final String deviceSeries = "E5";
-    public static final String CustomID = (String)APPConfig.advertisingData.CUSTOM_IDs.get("FFFF");
+    public static final String deviceSeries = "BC-5900B,BKC-5000B";  //0322 新增型號Easiprox⁺,Easiprox⁺ Slim,DG-800⁺,DG-160⁺
+    public static final String CustomID = (String)APPConfig.advertisingData.CUSTOM_IDs.get("0001");
     public static int Convert_RSSI_to_LEVEL(int rssi)
     {
-        return ((rssi - E3K_DEVICES_BLE_RSSI_MIN) / E3K_DEVICES_BLE_RSSI_LEVEL_CONVERT_BASE);
+//        return ((rssi - E3K_DEVICES_BLE_RSSI_MIN) / E3K_DEVICES_BLE_RSSI_LEVEL_CONVERT_BASE);
+        int value = (E3K_DEVICES_BLE_RSSI_MAX - rssi) / E3K_DEVICES_BLE_RSSI_LEVEL_CONVERT_BASE;
+
+        if (value > E3K_DEVICES_BLE_RSSI_LEVEL_MAX)
+        {
+            value = E3K_DEVICES_BLE_RSSI_LEVEL_MAX;
+        }
+
+        if (value < E3K_DEVICES_BLE_RSSI_LEVEL_MIN)
+        {
+            value = E3K_DEVICES_BLE_RSSI_LEVEL_MIN;
+        }
+        return value;
     }
 
     public static int Convert_LEVEL_to_RSSI(int level)

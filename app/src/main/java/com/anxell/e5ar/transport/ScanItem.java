@@ -10,7 +10,7 @@ public class ScanItem {
     public String Custom;
     public String Model;
     public String Category;
-    public String Color;
+//    public String Color;
     public String reserved;
     public int rssi;
     public int alive_cnt;
@@ -20,13 +20,13 @@ public class ScanItem {
         clear();
     }
 
-    public ScanItem(String dev_name, String dev_addr,String custom,String model,String category,String color,String reserved,int rssi, int alive_cnt) {
+    public ScanItem(String dev_name, String dev_addr,String custom,String model,String category,String reserved,int rssi, int alive_cnt) {
         this.dev_name = dev_name;
         this.dev_addr = dev_addr;
         this.Custom = custom;
         this.Model = model;
         this.Category = category;
-        this.Color = color;
+//        this.Color = color;
         this.reserved = reserved;
         this.rssi = rssi;
         this.alive_cnt = alive_cnt;

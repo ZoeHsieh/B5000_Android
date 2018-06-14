@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">E5AKR</string>
+    <string name="app_name">ROFU B5000</string>
 
     <string name="bluetooth_access_control_system">Bluetooth Access Control System</string>
-    <string name="anxell_technology_coproration">&#169; 2017 Anxell Technology Coproration</string>
+    <string name="anxell_technology_coproration">© 2018 Copyright ROFU Security International Corp.</string>
 
     <string name="hello">Hello!</string>
     <string name="welcome">Welcome</string>
@@ -47,7 +47,7 @@
     <string name="always_locked">常にロック</string>
 
     <string name="tamper_sensor">衝撃アラーム センサー</string>
-    <string name="proximity_read_range">非接触読み取り距離</string>
+    <string name="proximity_read_range">オート時の読み取り距離</string>
     <string name="door_re_lock_time">ドアリロックタイム</string>
     <string name="sec">%1$s 秒</string>
 
@@ -61,7 +61,7 @@
     <string name="please_wait">お待ちください…</string>
 
     <string name="device_distance">デバイスの距離</string>
-    <string name="proximity_read_range_setting">非接触読み取り距離</string>
+    <string name="proximity_read_range_setting">オート時の読み取り距離</string>
 
     <string name="edit_door_re_lock_time">ドアリロックタイムの編集（1~1800秒）</string>
     <string name="please_enter_the_number_of_seconds">秒数を入力してください</string>
@@ -121,7 +121,7 @@
     <string name="add_more">更に追加</string>
 
     <string name="done">完了</string>
-    <string name="please_setting_proximity_read_range">非接触読み取り距離</string>
+    <string name="please_setting_proximity_read_range">オート時の読み取り距離</string>
     <string name="msg_password_error">パスワードが間違っています。もう一度トライしてください</string>
     <string name="msg_please_enter_account">IDを入力してください</string>
     <string name="msg_please_enter_password_1">パスワードを入力してください</string>
@@ -195,28 +195,34 @@
     <string name="users_pwd_edit_dialog_title">パスワードの編集：(4~8桁）</string>
     <string name="Confirm">承認</string>
     <string name="APP_version">APPのバージョン:</string>
-    <string name="over_range_alarm">Over range</string>
-    <string name="settings_Admin_card">Admin Card/Tag</string>
-    <string name="settings_Admin_card_Edit">Edit Admin Card/Tag</string>
-    <string name="tamper_sensor_Level">Tamper Sensor Level</string>
+    <string name="over_range_alarm">検出範囲外です、0〜255の数字を入力してください。</string>
+    <string name="settings_Admin_card">管理者カード/フォブ</string>
+    <string name="settings_Admin_card_Edit">管理者のカード/フォブの編集</string>
+    <string name="tamper_sensor_Level">衝撃センサーレベル</string>
     <string name="_10_digits">10 digits</string>
     <string name="enable_phone_access">Phone Access</string>
     <string name="openType_Card">Card/Tag</string>
     <string name="enable_card_access">Card Access</string>
-    <string name="users_manage_edit_status_Admin_card">Invalid Card!!</string>
-    <string name="users_manage_edit_status_duplication_card">Card/Tag Duplication!!</string>
-    <string name="Card">Card/Tag</string>
-    <string name="users_card_edit_dialog_title">Edit Card/Tag: (10 digits)</string>
-    <string name="Level_1">Level 1</string>
-    <string name="Level_2">Level 2</string>
-    <string name="Level_3">Level 3</string>
-    <string name="UserList_search_placeHolder">Please input User ID</string>
-    <string name="History_search_placeHolder">Please input User ID</string>
+    <string name="users_manage_edit_status_Admin_card">カード/フォブが無効です</string>
+    <string name="users_manage_edit_status_duplication_card">カード/フォブの重複</string>
+    <string name="Card">Card/Fob</string>
+    <string name="users_card_edit_dialog_title">カード/フォブの編集：10桁</string>
+    <string name="Level_1">レベル1 (高感度)</string>
+    <string name="Level_2">レベル2 (中感度)</string>
+    <string name="Level_3">レベル3 (低感度)</string>
+    <string name="UserList_search_placeHolder">ユーザーIDを入力し、ユーザーを探します。</string>
+    <string name="History_search_placeHolder">ユーザーIDを入力し、ユーザーを探します。</string>
     <string name="EnglishCharsAndNumber">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
 
     <string name="open_fail_permission_denied">アクセスが拒否されました。 あなたの管理者に連絡してください。</string>
     <string name="open_fail_no_eroll">アクセスが拒否されました。 最初にログインしてアクセスしてください。</string>
     <string name="eroll_fail">ログインに失敗しました。 ログイン情報を確認するか、管理者に連絡してください。</string>
     <string name="eroll_success">あなたは正常にログインしました。 あなたは今ドアを開けることができます。</string>
+
+    <string name="permission_title">Functionality limited</string>
+    <string name="permission_message_location">Since location access has not been granted, this app will not be able to discover beacons.</string>
+    <string name="permission_message_storage">Since storage access has not been granted, this app will not be able to backup settings.</string>
+    <string name="need_gps">Android OS 6.0 and up require to enable Location service to find nearby Bluetooth devices. Make sure to enable Location service on your phone.</string>
+
 
 </resources>

@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">E5AKR</string>
+    <string name="app_name">ROFU B5000</string>
 
     <string name="bluetooth_access_control_system">Bluetooth Access Control System</string>
-    <string name="anxell_technology_coproration">&#169; 2017 Anxell Technology Coproration</string>
+    <string name="anxell_technology_coproration">© 2018 Copyright ROFU Security International Corp.</string>
 
     <string name="hello">Hello!</string>
     <string name="welcome">歡迎使用 E5AKR</string>
@@ -25,8 +25,8 @@
     <string name="cancel">取消</string>
     <string name="model">%1$s</string>
     <string name="choose_device">請選擇裝置</string>
-    <string name="door_closed">DOOR CLOSED</string>
-    <string name="door_opened">DOOR OPENED</string>
+    <string name="door_closed">LOCKED</string>
+    <string name="door_opened">UNLOCKED</string>
     <string name="open">OPEN</string>
     <string name="automatic_sensor_to_open">自動感應開門</string>
 
@@ -212,16 +212,25 @@
     <string name="settings_device_vr">韌體版本</string>
     <string name="APP_version">APP 版本:</string>
     <string name="over_range_alarm">超過範圍</string>
-    <string name="Level_1">等級1</string>
-    <string name="Level_2">等級2</string>
-    <string name="Level_3">等級3</string>
+    <string name="Level_1">等級1(靈敏)</string>
+    <string name="Level_2">等級2(中等)</string>
+    <string name="Level_3">等級3(不靈敏)</string>
     <string name="UserList_search_placeHolder">請輸入User ID</string>
     <string name="History_search_placeHolder">請輸入User ID</string>
-    <string name="openType_Card">Card/Tag</string>
+    <string name="openType_Card">卡片</string>
     <string name="EnglishCharsAndNumber">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
 
     <string name="open_fail_permission_denied">Access Denied. Please Contact Your Administrator.</string>
     <string name="open_fail_no_eroll">Access Denied. Please Login First to Get Access.</string>
     <string name="eroll_fail">Login Failed. Please Verify Your Login Information Or Contact Your Administrator.</string>
     <string name="eroll_success">You Have Successfully Logged In. You May Now Unlock A Door.</string>
+
+
+    <string name="permission_title">功能受限</string>
+    <string name="permission_message_location">需授予位置的存取權限，APP才能掃瞄藍牙裝罝</string>
+    <string name="permission_message_storage">需授予儲存空間的存取權限，APP才能執行備份設定功能</string>
+    <string name="need_gps">安卓6.0以上裝置需開啟位罝服務才能掃瞄藍牙裝罝</string>
+
+
+
 </resources>
