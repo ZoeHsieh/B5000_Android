@@ -103,6 +103,10 @@ public class SettingActivity extends bpActivity implements View.OnClickListener 
     private final int setupLogin = 3;
     private  int loginProcIndex = 0;
 
+    ///1225
+    private String readCardValue = "";
+    private AlertDialog runningDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

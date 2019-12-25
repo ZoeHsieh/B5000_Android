@@ -832,7 +832,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         if(isAutoMode&&!bgAutoTimerflag)
             StartBgAutoTimer();
         else if(!ScanningTimerFlag)
-            StartScanningTimer();
+        //    StartScanningTimer();
         mDoorIB.setImageResource(R.drawable.door_close);
         mDoorStatusTV.setText(R.string.door_closed);
         mDoorStatusTV.setTextColor(getResources().getColor(android.R.color.black));
@@ -934,7 +934,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                         adminMenu.UsersEnrollDialog(mSYS_BLE_MAC_Address_RAW,APPConfig.ADMIN_ENROLL, bdAddr);
 
                     }else{
-                        StartScanningTimer();
+                        //StartScanningTimer();
                     }
 
                 }else{
@@ -951,7 +951,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                         isCheckConnection = false;
                         openSettingPage();
                     }else{
-                        StartScanningTimer();
+                        //StartScanningTimer();
                     }
 
                 }else{
@@ -1035,7 +1035,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 
                 }
             }else{
-                StartScanningTimer();
+                //StartScanningTimer();
             }
         }else{
             show_toast_msg(getString(R.string.AUTO_ENABLE_CONFLICT));
@@ -1052,10 +1052,10 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                 BLE_Scanner_Start(true);
             }
         },500);*/
-        if(!isEditDeviceName){
-            BLE_Scanner_Start(true);
-            // Util.debugMessage(TAG,"timer rescan",true);
-        }
+//        if(!isEditDeviceName){
+//            BLE_Scanner_Start(true);
+//            // Util.debugMessage(TAG,"timer rescan",true);
+//        }
         ScanningTimerFlag = true;
         scaningTimer = new Thread(new Runnable() {
             @Override
@@ -1099,15 +1099,15 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 //                        }
 //                    });
 
-                    if(!isScanning&&!isEditDeviceName) {
-                        BLE_Scanner_Start(true);
-                        //Util.debugMessage(TAG,"rescan",true);
-                    }
-
+//                    if(!isScanning&&!isEditDeviceName) {
+//                        BLE_Scanner_Start(true);
+//                        //Util.debugMessage(TAG,"rescan",true);
+//                    }
+                    BLE_Scanner_Start(true);
                     checkDeviceAlive();
 
                     try{
-                        Thread.sleep(5000);
+                        Thread.sleep(10000);
 
 
                     }catch(java.lang.InterruptedException e){
@@ -1308,7 +1308,7 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     }
 
     private void showDevices() {
-        StopScanningTimer();
+        //StopScanningTimer();
         AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
         builder.setTitle(R.string.choose_device);
         builder.setCancelable(true);
@@ -1361,13 +1361,13 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
         if(deviceList.length >0)
             dialog.show();
 
-        StartScanningTimer();
+       // StartScanningTimer();
     }
 
     private void updateStatus() {
         if (mIsAutoOpen) {
             Util.debugMessage(TAG,"auto off",debugFlag);
-            StartScanningTimer();
+            //StartScanningTimer();
             StopBgAutoTimer();
             isAutoMode = false;
             // bgAutoTimer = null;

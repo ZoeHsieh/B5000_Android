@@ -169,7 +169,7 @@
     <string name="start">وقت البدء</string>
     <string name="start_time">وقت البدء</string>
     <string name="program_success">Success</string>
-    <string name="anxell_technology_coproration">"© 2018 Copyright ROFU Security International Corp. "</string>
+    <string name="anxell_technology_coproration">© 2020 Copyright ROFU Security International Corp.</string>
     <string name="model">%1$s</string>
     <string name="sec">%1$s Sec.</string>
     <string name="_10_digits">10 digits</string>
@@ -196,7 +196,7 @@
     <string name="permission_message_location">Since location access has not been granted, this app will not be able to discover beacons.</string>
     <string name="permission_message_storage">Since storage access has not been granted, this app will not be able to backup settings.</string>
     <string name="need_gps">Android OS 6.0 and up require to enable Location service to find nearby Bluetooth devices. Make sure to enable Location service on your phone.</string>
-
+    <string name="note_for_card_in_user_add">Clickbelowtoenterthecard/fobnumberorscanthecardonthekeypad/reader</string>
 
 
 </resources>

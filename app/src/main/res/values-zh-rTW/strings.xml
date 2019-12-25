@@ -2,7 +2,7 @@
     <string name="app_name">ROFU B5000</string>
 
     <string name="bluetooth_access_control_system">Bluetooth Access Control System</string>
-    <string name="anxell_technology_coproration">© 2018 Copyright ROFU Security International Corp.</string>
+    <string name="anxell_technology_coproration">© 2020 Copyright ROFU Security International Corp.</string>
 
     <string name="hello">Hello!</string>
     <string name="welcome">歡迎使用 E5AKR</string>
@@ -230,7 +230,7 @@
     <string name="permission_message_location">需授予位置的存取權限，APP才能掃瞄藍牙裝罝</string>
     <string name="permission_message_storage">需授予儲存空間的存取權限，APP才能執行備份設定功能</string>
     <string name="need_gps">安卓6.0以上裝置需開啟位罝服務才能掃瞄藍牙裝罝</string>
-
+    <string name="note_for_card_in_user_add">Clickbelowtoenterthecard/fobnumberorscanthecardonthekeypad/reader</string>
 
 
 </resources>

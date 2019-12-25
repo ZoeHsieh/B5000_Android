@@ -429,8 +429,17 @@ public class AdminMenu {
 
                             }else  if(restoreCount ==2&&!isRestoreCmdPut){
                                 byte SensorLevel [] = settingFile.readData();
-                                bpProtocol.setSensorDegree(SensorLevel[0]);
+                                //
+                                if  (SensorLevel[0] != BPprotocol.sensor_level1 && SensorLevel[0] != BPprotocol.sensor_level2 && SensorLevel[0] != BPprotocol.sensor_level3 )
+                                {
+                                    bpProtocol.setSensorDegree(BPprotocol.sensor_level1);
+                                }
+                                else
+                                {
+                                    bpProtocol.setSensorDegree(SensorLevel[0]);
+                                }
 
+                                //
                                 isRestoreCmdPut = true;
 
                             }else  if(restoreCount ==1&&!isRestoreCmdPut){
