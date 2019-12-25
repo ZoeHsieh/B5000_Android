@@ -1,5 +1,6 @@
 package com.anxell.e5ar;
 
+import android.app.Activity; //1225
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.view.MotionEvent;
+import android.widget.EditText;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
@@ -48,6 +51,13 @@ public class UsersListActivity extends bpActivity implements View.OnClickListene
     public static boolean isLoadUserListCompleted = false;
     public String deviceBD_ADDR = "";
 
+    //1225
+    public MyToolbar toolbar;
+    private String deviceName =  "";
+    private EditText searchView_ET;
+    private Activity curActivity;
+    //1225
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +65,11 @@ public class UsersListActivity extends bpActivity implements View.OnClickListene
         setContentView(R.layout.activity_users_info);
         Intent intent = getIntent();
         deviceBD_ADDR = intent.getStringExtra(APPConfig.deviceBddrTag);
+
+        //1225
+        deviceName = intent.getStringExtra(APPConfig.deviceNameTag);
+        curActivity = this;
+        //1225
 
         registerReceiver(mGattUpdateReceiver,  getIntentFilter());
         findViews();
@@ -66,6 +81,19 @@ public class UsersListActivity extends bpActivity implements View.OnClickListene
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
+
+        //1225
+        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(searchView_ET != null)
+                    Util.closeSoftKeybord(searchView_ET,curActivity);
+
+                return false;
+            }
+        });
+        //1225
+
         mAdapter.updateData(mUserDataList);
         bpProtocol.getUsersCount();
        currentClassName = getLocalClassName();
@@ -127,7 +155,7 @@ public class UsersListActivity extends bpActivity implements View.OnClickListene
     }
 
     private void setListeners() {
-        MyToolbar toolbar = (MyToolbar) findViewById(R.id.toolbarView);
+        toolbar = (MyToolbar) findViewById(R.id.toolbarView);
         toolbar.setRightBtnClickListener(this);
     }
 
@@ -157,6 +185,31 @@ public class UsersListActivity extends bpActivity implements View.OnClickListene
                 return false;
             }
         });
+
+        //1225
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    if(!isLoadUserListCompleted){
+                        if(progressDialog!=null)
+                            progressDialog.show();
+
+
+                    }
+                }
+            }
+        });
+
+
+
+        int id = searchView.getContext()
+                .getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+        searchView_ET = (EditText) searchView.findViewById(id);
+        searchView_ET.setEnabled(true);////////searchbar?????????
+        //1225
+
     }
 
     @Override
@@ -326,6 +379,9 @@ public class UsersListActivity extends bpActivity implements View.OnClickListene
                     }else if(userMax == 0){
                         userMax =0;
                         mAdapter.notifyDataSetChanged();
+                        //1225
+                        searchView_ET.setEnabled(true);
+                        //1225
                         isLoadUserListCompleted = true;
                         GeneralDialog.MessagePromptDialog(this,"",getString(R.string.no_user_note));
                     }

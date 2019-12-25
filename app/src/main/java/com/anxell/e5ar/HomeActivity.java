@@ -58,8 +58,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class HomeActivity extends bpActivity implements View.OnClickListener {
-    private String TAG = HomeActivity.class.getSimpleName().toString();
-    private Boolean debugFlag = true;
+    private String TAG = HomeActivity.class.getSimpleName();//1225
+    private Boolean debugFlag = false; //1225
     private PercentRelativeLayout mFoundV;
     private MyDeviceView mDeviceV;
     private FontTextView mDoorStatusTV;
@@ -388,10 +388,11 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
     private final ScanCallback mScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
-            if (result.getScanRecord().getManufacturerSpecificData(93) == null)
-            {
-                return;
-            }
+            //1225
+//            if (result.getScanRecord().getManufacturerSpecificData(93) == null)
+//            {
+//                return;
+//            }
 
             //super.onScanResult(callbackType, result);
             int duplicate_idx = -1;
@@ -408,6 +409,11 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
 //            byte mandufacturerData[] = result.getScanRecord().getManufacturerSpecificData(0x0000);
             SparseArray<byte[]> mandufacturerData = result.getScanRecord().getManufacturerSpecificData();
 
+            //1225
+            if (mandufacturerData.size() <= 0)
+                return;
+            //1225
+
             if (debugFlag) {
                 int count = 0;
                 for (byte tmp : rawData){
@@ -416,13 +422,17 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                 }
             }
 
+            //1225
+            Util.debugMessage(TAG, "onScanResult: NEW Address = [" + result.getDevice().getAddress() + "], RSSI = " + result.getRssi() + ".", debugFlag);
+            Util.debugMessage(TAG, " advisting Data len=" + mandufacturerData.valueAt(0).length, debugFlag);
+            if (mandufacturerData.valueAt(0).length < 6)
+                return;
+            //1225
 
 
 //            String customID = Integer.toHexString(mandufacturerData.keyAt(0) & 0x00FF | 0xFF00);
             String companyID = Integer.toHexString(mandufacturerData.keyAt(0) & 0xFFFF | 0x0000);
             companyID = Util.padRight(companyID,4,'0');
-
-
 
 
 //            String customID = Util.bytesToHex(Arrays.copyOfRange(customID_byte ,0,2));
@@ -438,10 +448,12 @@ public class HomeActivity extends bpActivity implements View.OnClickListener {
                 return;
 
 
-            if  (customIDStr != APPConfig.CustomID.toUpperCase())
+            //1225
+            if  (!customIDStr.equals(APPConfig.CustomID))
             {
                 return;
             }
+            //1225
 
 
             String deviceModel = Util.bytesToHex(Arrays.copyOfRange(mandufacturerData.valueAt(0),0,2));
