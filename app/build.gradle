@@ -7,8 +7,8 @@ android {
         applicationId "com.rofu.B5000"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 6  //0121
-        versionName "2.2" //0121
+        versionCode 7  //0310
+        versionName "2.3" //0310
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
