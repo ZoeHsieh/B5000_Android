@@ -78,7 +78,7 @@ public class AboutUsActivity extends bpActivity {
                     try{
                         isACTIVE_SEND = true;
                         Intent emailIntent=new Intent(Intent.ACTION_SEND);
-                        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"louise@anxell.com"});
+                        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"linda@rofu.com"});
                         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Sent from ROFU APP");
                         emailIntent.putExtra(Intent.EXTRA_TEXT, "");
                         emailIntent.setType("text/plain");
