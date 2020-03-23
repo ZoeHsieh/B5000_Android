@@ -6,13 +6,13 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.anxell.e5ar.Config;
-
+import android.support.v7.widget.AppCompatTextView;
 
 /**
  * Created by nsdi-monkey on 2017/2/14.
  */
 
-public class FontTextView extends TextView {
+public class FontTextView extends AppCompatTextView {
 
     public FontTextView(Context context, AttributeSet attrs) {
         super(context, attrs);

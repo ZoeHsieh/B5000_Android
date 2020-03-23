@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputType;
@@ -22,7 +24,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-
+import android.widget.TextView;
 import com.anxell.e5ar.custom.FontEditText;
 import com.anxell.e5ar.custom.FontTextView;
 import com.anxell.e5ar.custom.My2TextView;
@@ -35,7 +37,7 @@ import com.anxell.e5ar.transport.RBLService;
 import com.anxell.e5ar.transport.SettingData;
 import com.anxell.e5ar.transport.bpActivity;
 import com.anxell.e5ar.util.Util;
-
+import com.anxell.e5ar.custom.DebouncedOnClickListener;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -789,7 +791,7 @@ public class SettingActivity extends bpActivity implements View.OnClickListener,
 
     private void showReLockTimeDialog(String currentTime) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setTitle(R.string.edit_door_re_lock_time);
+        //dialogBuilder.setTitle(R.string.edit_door_re_lock_time);
         //dialogBuilder.setMessage(getString(R.string._4_8_digits));
 
         LayoutInflater inflater = this.getLayoutInflater();
@@ -797,6 +799,8 @@ public class SettingActivity extends bpActivity implements View.OnClickListener,
         dialogBuilder.setView(dialogView);
 
         final FontEditText editText = (FontEditText) dialogView.findViewById(R.id.editText);
+        TextView title_tv = (TextView) dialogView.findViewById(R.id.textView);
+        title_tv.setVisibility(View.VISIBLE);
 
         editText.setText(currentTime);
         editText.setTextColor(Color.BLACK);
@@ -1606,6 +1610,18 @@ public class SettingActivity extends bpActivity implements View.OnClickListener,
         return false;
     }
     /// read card 1225 ///////////////////////////////////////////////////////////////////
+
+
+
+    public static void openWebLink(Context mContest,String url)
+    {
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder()
+                .setShowTitle(true);
+        CustomTabsIntent customTabsIntent = builder.build();
+        isACTIVE_SEND = true;
+        customTabsIntent.launchUrl(mContest, Uri.parse(url));
+    }
+
 
 
 }

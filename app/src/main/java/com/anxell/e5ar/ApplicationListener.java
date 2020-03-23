@@ -12,6 +12,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import static com.anxell.e5ar.transport.bpActivity.isACTIVE_SEND;
+
 
 public class ApplicationListener implements Application.ActivityLifecycleCallbacks {
     private static Map<String,Activity> destoryMap = new HashMap<>();
@@ -26,6 +28,7 @@ public class ApplicationListener implements Application.ActivityLifecycleCallbac
     @Override
     public void onActivityStopped(Activity activity) {
         foregroundCount--;
+        if (isACTIVE_SEND == false){
         if (foregroundCount <= 0) {
             // TODO 这里处理从前台进入到后台的逻辑
 
@@ -35,7 +38,7 @@ public class ApplicationListener implements Application.ActivityLifecycleCallbac
             }
             int id= android.os.Process.myPid();
             android.os.Process.killProcess(id);
-        }
+        }}
     }
     /*
      * 下面回调，我们都不需要

@@ -61,6 +61,12 @@ public class bpActivity extends BaseActivity {
     public String mSYS_BLE_MAC_Address;
     public static List<UserData> mUserDataList = new ArrayList<>();
     public static List<HistoryData> mHistoryDatas = new ArrayList<>();
+    public static boolean isACTIVE_SEND = false;
+
+    @Override
+    public void finishActivity(int requestCode) {
+        super.finishActivity(requestCode);
+    }
 
     private Thread CmdWorkerThread = null;
 

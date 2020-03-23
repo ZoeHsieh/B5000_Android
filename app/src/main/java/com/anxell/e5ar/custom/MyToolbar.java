@@ -10,7 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 import com.anxell.e5ar.R;
 
 /**
@@ -59,7 +60,16 @@ public class MyToolbar extends FrameLayout {
             mLeftTV.setText(leftText);
         }
 
-
+        // 0323
+        DisplayMetrics metric = new DisplayMetrics();
+        WindowManager gm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        gm.getDefaultDisplay().getMetrics(metric);
+        int width = metric.widthPixels;     // 螢幕寬度（畫素）
+        int height = metric.heightPixels;   // 螢幕高度（畫素）
+        float density = metric.density;      // 螢幕密度（0.75 / 1.0 / 1.5）
+        int densityDpi = metric.densityDpi;  // 螢幕密度DPI（120 / 160 / 240）
+        mTitleTV.setMaxWidth(width/100 * 50);
+        //0323
         String titleText = typedArray.getString(R.styleable.MyToolbarAttr_titleText);
         mTitleTV.setText(titleText);
 
